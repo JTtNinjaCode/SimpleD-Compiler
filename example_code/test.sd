@@ -1,22 +1,19 @@
-void main() {
-    int index;
+float ary[100];
 
-    int test[100];
+const int asd;
+int abb;
+int a, b, c, d;
+int add (int a, int b)
+{
+  ;
+  ;
+  return a+b;
+  return ;
+}
 
-    // for loop
-    for (index = 1; index <= n; index++)
-    {
-      sum = sum + index;
-    }
-    print "The sum is ";
-    println sum;
-
-    // foreach loop
-    foreach (index : n .. 1)
-    {
-      sum = sum + index;
-    }
-    print "The total sum is ";
-    println sum;
+void main()
+{
+  int a0, a1, a2, a3, a5 = 5;
+  a0 + a1 * (a2 * a3) / a7 * -a1 > 5;
 }
 

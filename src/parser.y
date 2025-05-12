@@ -1,16 +1,9 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include "sym_table.h"
-
-struct StatContext {
-    int indent;
-    int num_stmt;
-    int num_param;
-    int num_arg;
-} stat_ctx;
-
-#define TRACE(fmt, ...)    {   for (int i = 0; i < stat_ctx.indent; i++) putchar('\t'); printf(fmt"\n", ##__VA_ARGS__);} while(0)
+#include "stat_and_trace.h"
 
 extern void yyerror(char *s);
 extern int yylex();
@@ -44,8 +37,7 @@ typedef struct IdentDecl {
 %token R_BRACKETS
 
 /* Todo: Implement C Operator Precedence */
-
-%token DOUBLE_ADD DOUBLE_SUB MUL DIV MOD ADD SUB
+%token DADD DSUB MUL DIV MOD ADD SUB
 %token LT LE GT GE EQ NE AND OR
 %token TERNARY ASSIGN
 
@@ -69,9 +61,9 @@ typedef struct IdentDecl {
 %left ADD SUB
 %left MUL DIV MOD
 %right USUB
-%right DOUBLE_ADD DOUBLE_SUB
+%right DADD DSUB
 
-%start translation_unit
+%start trans_unit
 
 %%
 
@@ -88,57 +80,65 @@ jstmt       = jump statement
 arg         = argument
 param       = parameter
 decl        = declaration
+ident       = identifier
 */
 
-translation_unit
-    : translation_unit external_decl                                { }
-    | /* epsilon */                                                 { TRACE("Reducing to translation_unit");    stat_ctx.indent++;}
-    ;
+trans_unit
+    : trans_unit external_decl                                      { }
+    | /* epsilon */                                                 { TRACE0("trans_unit");   global_stat_ctx.indent++;   }
 
 external_decl
     : func_def                                                      { }
-    | obj_def                                                       { TRACE("Reducing to obj_def");    }
-    ;
+    | obj_def                                                       { }
 
 func_def
-    : type IDENT L_PARENTHESES param_list R_PARENTHESES             {
-            TRACE("Reducing to func, nums of param:%d", stat_ctx.num_param);
-            stat_ctx.num_param = 0; stat_ctx.indent++;
-        } cstmt { stat_ctx.indent--; }       
-    | type IDENT L_PARENTHESES R_PARENTHESES cstmt                  {
-            TRACE("Reducing to func, nums of param:0");
-            stat_ctx.indent++;               
-        } cstmt { stat_ctx.indent--; }    
-    ;
+    : type IDENT {
+            TRACE("func_def", "begin");
+            TRACE("func_def", "ret type: %s", "Hello");
+            TRACE("func_def", "func ident: %s", $2);
+            global_stat_ctx.num_param = 0;
+        } L_PARENTHESES param_list_or_empty R_PARENTHESES {
+            TRACE("func_def", "nums of param: %d", global_stat_ctx.num_param);
+            global_stat_ctx.num_param = 0;
+            global_stat_ctx.indent++;
+        } cstmt {
+            global_stat_ctx.indent--;
+            TRACE("func_def", "end");
+        }       
+
+param_list_or_empty
+    : param_list
+    | /* epsilon */
 
 param_list
-    : type IDENT COMMA param_list                                   { stat_ctx.num_param++; }
-    | type IDENT                                                    { stat_ctx.num_param++;   }
-    ;
+    : type IDENT COMMA param_list                                   { global_stat_ctx.num_param++; TRACE("func_def", "param ident: %s ", $2);     }
+    | type IDENT                                                    { global_stat_ctx.num_param++; TRACE("func_def", "param ident: %s ", $2);     }
 
 stmts
-    : stmts stmt                            {   }
+    : stmts stmt                            { }
     | /* epsilon */
-    ;
 
 stmt
-    : obj_def                               { TRACE("Reducing to obj_def");       }
-    | cstmt                                 { TRACE("Reducing to cstmt ");         }
-    | estmt                                 { TRACE("Reducing to estmt ");         }
-    | sstmt                                 { TRACE("Reducing to sstmt ");         }
-    | istmt                                 { TRACE("Reducing to istmt");         }
-    | jstmt                                 { TRACE("Reducing to jstmt");         }
-    ;
+    : obj_def                               { }
+    | cstmt                                 { }
+    | estmt                                 { }
+    | sstmt                                 { }
+    | istmt                                 { }
+    | jstmt                                 { }
 
 obj_def
-    : constant_decl
-    | variable_decl
-    | array_decl
-    ;
+    : const_decl                            { }
+    | var_decl                              { }
+    | ary_decl                              { }
 
-constant_decl
-    : CONST type IDENT ASSIGN const_expr SEMICOLON
-    ;
+const_decl
+    : CONST type {
+            TRACE("const_decl", "begin");
+            global_stat_ctx.indent++;
+        } ident_decl_list SEMICOLON  {
+            global_stat_ctx.indent--;
+            TRACE("const_decl", "end");
+        }
 
 type
     : VOID
@@ -147,107 +147,139 @@ type
     | STRING
     | FLOAT
     | DOUBLE
-    ;
 
-variable_decl
-    : type ident_decl_list SEMICOLON
-    ;
+var_decl
+    : type ident_decl_list SEMICOLON {
+            TRACE0("var_decl");
+        }
 
 ident_decl_list
     : ident_decl COMMA ident_decl_list
     | ident_decl
-    ;
 
 ident_decl
-    : IDENT ASSIGN const_expr
+    : IDENT ASSIGN constexpr
     | IDENT
-    ;
 
-array_decl
-    : type IDENT bracket_list SEMICOLON
+ary_decl
+    : type IDENT bracket_list SEMICOLON {
+            TRACE0("ary_decl");
+        }
 
 bracket_list
     : L_SQUARE_BRACKETS INT_LITERAL R_SQUARE_BRACKETS bracket_list
     | L_SQUARE_BRACKETS INT_LITERAL R_SQUARE_BRACKETS
-    ;
 
 cstmt
-    : L_BRACKETS stmts R_BRACKETS
-    ;
+    : L_BRACKETS {
+        TRACE("cstmt", "begin");
+        global_stat_ctx.indent++;
+    } stmts R_BRACKETS {
+        global_stat_ctx.indent--;
+        TRACE("cstmt", "numbers of stmt: %d", local_stat_ctx.num_substat);
+        TRACE("cstmt", "end");
+    }
 
 /* no just expression statement, also contain some speicial statement, like print, bruh */
 estmt
-    : PRINT expression SEMICOLON                { }
-    | PRINTLN expression SEMICOLON              { }
-    | READ IDENT SEMICOLON                      { }
-    | expression SEMICOLON                      { }      
-    | SEMICOLON                                 { }
-    ;
+    : PRINT {
+            TRACE("estmt", "begin");
+            global_stat_ctx.indent++;
+        } expression SEMICOLON {
+            global_stat_ctx.indent--;
+            TRACE("estmt", "end" );
+        }
+    | PRINTLN {
+            TRACE("estmt", "begin");
+            global_stat_ctx.indent++;
+        } expression SEMICOLON {
+            global_stat_ctx.indent--;
+            TRACE("estmt", "end");
+        }
+    | READ IDENT {
+            TRACE("estmt", "begin");
+            TRACE("estmt", "ident: %s", $2);
+        }  SEMICOLON {
+            TRACE("estmt", "end");
+        }
+    | expr_preamble {
+            TRACE("estmt", "begin");
+            global_stat_ctx.indent++;
+        } expression SEMICOLON {
+            global_stat_ctx.indent--;
+            TRACE("estmt", "end");
+        }      
+    | SEMICOLON { TRACE("estmt", "empty"); }
+
+expr_preamble
+    :   /* */
 
 sstmt
     : IF L_PARENTHESES bool_expr R_PARENTHESES estmt_or_cstmt                                       { }
     | IF L_PARENTHESES bool_expr R_PARENTHESES estmt_or_cstmt ELSE estmt_or_cstmt                   { }
-    ;
 
 estmt_or_cstmt
     : estmt
     | cstmt
-    ;
 
 istmt
     : WHILE L_PARENTHESES bool_expr R_PARENTHESES estmt_or_cstmt                                                 { }
     | FOR L_PARENTHESES expression SEMICOLON expression SEMICOLON expression R_PARENTHESES estmt_or_cstmt        { }
     | FOREACH L_PARENTHESES IDENT COLON num RANGE num R_PARENTHESES estmt_or_cstmt                               { }
-    ;
 
 jstmt
-    : RETURN expression SEMICOLON
-    | RETURN SEMICOLON
-    ;
+    : RETURN {
+            TRACE("jstmt", "begin");
+            global_stat_ctx.indent++;
+        } expr_or_none SEMICOLON {
+            global_stat_ctx.indent--;
+            /* record: has expr or not */
+            TRACE("jstmt", "end");
+        }
+
+expr_or_none
+    : expression            {  /* ctx has expr = true ; */ }
+    | /* epsilon */         {  /* ctx has expr = false; */ }
 
 bool_expr
     : expression
-    ;
 
 num
     : IDENT
     | INT_LITERAL
-    ;
 
-const_expr
+constexpr
     : INT_LITERAL
     | FLOAT_LITERAL
     | STRING_LITERAL
     | TRUE
     | FALSE
-    ;
 
 /* One Confliction Below */
 expression
-    : expression ADD expression                                     { TRACE("Reducing to ADD"); }
-    | expression SUB expression                                     { TRACE("Reducing to SUB"); }
-    | expression MUL expression                                     { TRACE("Reducing to MUL"); }
-    | expression DIV expression                                     { TRACE("Reducing to DIV"); }
-    | expression MOD expression                                     { TRACE("Reducing to MOD"); }
-    | expression GT expression                                      { TRACE("Reducing to GT"); }
-    | expression GE expression                                      { TRACE("Reducing to GE"); }
-    | expression LT expression                                      { TRACE("Reducing to LT"); }
-    | expression LE expression                                      { TRACE("Reducing to LE"); }
-    | expression EQ expression                                      { TRACE("Reducing to EQ"); }
-    | expression NE expression                                      { TRACE("Reducing to NE"); }
-    | expression AND expression                                     { TRACE("Reducing to AND"); }
-    | expression OR expression                                      { TRACE("Reducing to OR"); }
-    | expression ASSIGN expression                                  { TRACE("Reducing to ASSIGN"); }
-    | expression DOUBLE_ADD                                         { TRACE("Reducing to DOUBLE_ADD"); }
-    | expression DOUBLE_SUB                                         { TRACE("Reducing to DOUBLE_SUB"); }    
-    | NOT expression                                                { TRACE("Reducing to NOT"); }
-    | SUB expression %prec USUB                                     { TRACE("Reducing to SUB(Unary)"); }
-    | L_PARENTHESES expression R_PARENTHESES                        { TRACE("Reducing to PARENTHESE"); }
-    | IDENT                                                         { TRACE("Reducing to IDNET"); }
-    | literal                                                       { TRACE("Reducing to LITERAL"); }
-    | array_invoke                                                  { TRACE("Reducing to ARRAY"); }
-    | func_invoke                                                   { TRACE("Reducing to FUNC_INVOKE"); }
-    ;
+    : expression ADD    expression                          { TRACE0("ADD");                 }
+    | expression SUB    expression                          { TRACE0("SUB");                 }
+    | expression MUL    expression                          { TRACE0("MUL");                 }
+    | expression DIV    expression                          { TRACE0("DIV");                 }
+    | expression MOD    expression                          { TRACE0("MOD");                 }
+    | expression GT     expression                          { TRACE0("GT ");                 }
+    | expression GE     expression                          { TRACE0("GE ");                 }
+    | expression LT     expression                          { TRACE0("LT ");                 }
+    | expression LE     expression                          { TRACE0("LE ");                 }
+    | expression EQ     expression                          { TRACE0("EQ ");                 }
+    | expression NE     expression                          { TRACE0("NE");                 }
+    | expression AND    expression                          { TRACE0("AND");                 }
+    | expression OR     expression                          { TRACE0("OR");                 }
+    | expression ASSIGN expression                          { TRACE0("ASSIGN");                 }
+    | expression DADD                                       { TRACE0("DADD");         }
+    | expression DSUB                                       { TRACE0("DSUB");         }    
+    | NOT expression                                        { TRACE0("NOT");          }
+    | SUB expression %prec USUB                             { TRACE0("SUB(Unary)");   }
+    | L_PARENTHESES expression R_PARENTHESES                { TRACE0("PARENTHESE");   }
+    | IDENT                                                 { TRACE0("IDNET");          }
+    | literal                                               { TRACE0("literal");;         }
+    | ary_invoke                                            { TRACE0("ary_invoke");          }
+    | func_invoke                                           { TRACE0("func_invoke");          }
 
 literal
     : INT_LITERAL
@@ -255,25 +287,20 @@ literal
     | STRING_LITERAL
     | TRUE
     | FALSE
-    ;
 
-array_invoke
+ary_invoke
     : IDENT dim_expr_list
-    ;
 
 dim_expr_list
     : L_SQUARE_BRACKETS expression R_SQUARE_BRACKETS dim_expr_list
     | L_SQUARE_BRACKETS expression R_SQUARE_BRACKETS
-    ;
 
 func_invoke
-    : IDENT L_PARENTHESES arg_expr_list R_PARENTHESES                   {}
-    ;
+    : IDENT L_PARENTHESES arg_expr_list R_PARENTHESES
 
 arg_expr_list
     : expression
     | arg_expr_list COMMA expression
-    ;
 %%
 
 void yyerror(char *msg) {

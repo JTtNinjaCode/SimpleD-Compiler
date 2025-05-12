@@ -1,6 +1,0 @@
-Start to parsing program:
-Reducing to translation_unit
-	Reducing to obj_def
-	Reducing to func, nums of param:2
-		Reducing to LITERAL
-		Reducing to jstmt

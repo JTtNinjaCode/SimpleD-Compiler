@@ -23,9 +23,9 @@
 "}"    { return R_BRACKETS;         }
 
 "+"    { return ADD;            }
-"++"   { return DOUBLE_ADD;     }
+"++"   { return DADD;           }
 "-"    { return SUB;            }
-"--"   { return DOUBLE_SUB;     }
+"--"   { return DSUB;           }
 "*"    { return MUL;            }
 "/"    { return DIV;            }
 "%"    { return MOD;            }
