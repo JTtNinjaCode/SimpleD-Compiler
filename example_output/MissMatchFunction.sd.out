@@ -1,0 +1,23 @@
+Start to parsing program:
+Reducing to translation_unit
+	Reducing to obj_def
+	Reducing to func, nums of param:2
+		Reducing to IDNET
+		Reducing to IDNET
+		Reducing to ADD
+		Reducing to jstmt
+	Reducing to obj_def
+	Reducing to IDNET
+	Reducing to LITERAL
+	Reducing to ASSIGN
+	Reducing to estmt 
+	Reducing to IDNET
+	Reducing to IDNET
+	Reducing to LITERAL
+	Reducing to FUNC_INVOKE
+	Reducing to ASSIGN
+	Reducing to estmt 
+	Reducing to LITERAL
+	Reducing to estmt 
+	Reducing to func, nums of param:0
+ERROR: syntax error

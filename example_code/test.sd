@@ -1,0 +1,22 @@
+void main() {
+    int index;
+
+    int test[100];
+
+    // for loop
+    for (index = 1; index <= n; index++)
+    {
+      sum = sum + index;
+    }
+    print "The sum is ";
+    println sum;
+
+    // foreach loop
+    foreach (index : n .. 1)
+    {
+      sum = sum + index;
+    }
+    print "The total sum is ";
+    println sum;
+}
+

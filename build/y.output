@@ -1,0 +1,2976 @@
+Terminals unused in grammar
+
+    DOT
+    TERNARY
+    BREAK
+    CASE
+    CHAR
+    CONTINUE
+    DEFAULT
+    DO
+    EXTERN
+    SWITCH
+
+
+Grammar
+
+    0 $accept: translation_unit $end
+
+    1 translation_unit: translation_unit external_decl
+    2                 | ε
+
+    3 external_decl: func_def
+    4              | obj_def
+
+    5 $@1: ε
+
+    6 func_def: type IDENT L_PARENTHESES param_list R_PARENTHESES $@1 cstmt
+
+    7 $@2: ε
+
+    8 func_def: type IDENT L_PARENTHESES R_PARENTHESES cstmt $@2 cstmt
+
+    9 param_list: type IDENT COMMA param_list
+   10           | type IDENT
+
+   11 stmts: stmts stmt
+   12      | ε
+
+   13 stmt: obj_def
+   14     | cstmt
+   15     | estmt
+   16     | sstmt
+   17     | istmt
+   18     | jstmt
+
+   19 obj_def: constant_decl
+   20        | variable_decl
+   21        | array_decl
+
+   22 constant_decl: CONST type IDENT ASSIGN const_expr SEMICOLON
+
+   23 type: VOID
+   24     | BOOL
+   25     | INT
+   26     | STRING
+   27     | FLOAT
+   28     | DOUBLE
+
+   29 variable_decl: type ident_decl_list SEMICOLON
+
+   30 ident_decl_list: ident_decl COMMA ident_decl_list
+   31                | ident_decl
+
+   32 ident_decl: IDENT ASSIGN const_expr
+   33           | IDENT
+
+   34 array_decl: type IDENT bracket_list SEMICOLON
+
+   35 bracket_list: L_SQUARE_BRACKETS INT_LITERAL R_SQUARE_BRACKETS bracket_list
+   36             | L_SQUARE_BRACKETS INT_LITERAL R_SQUARE_BRACKETS
+
+   37 cstmt: L_BRACKETS stmts R_BRACKETS
+
+   38 estmt: PRINT expression SEMICOLON
+   39      | PRINTLN expression SEMICOLON
+   40      | READ IDENT SEMICOLON
+   41      | expression SEMICOLON
+   42      | SEMICOLON
+
+   43 sstmt: IF L_PARENTHESES bool_expr R_PARENTHESES estmt_or_cstmt
+   44      | IF L_PARENTHESES bool_expr R_PARENTHESES estmt_or_cstmt ELSE estmt_or_cstmt
+
+   45 estmt_or_cstmt: estmt
+   46               | cstmt
+
+   47 istmt: WHILE L_PARENTHESES bool_expr R_PARENTHESES estmt_or_cstmt
+   48      | FOR L_PARENTHESES expression SEMICOLON expression SEMICOLON expression R_PARENTHESES estmt_or_cstmt
+   49      | FOREACH L_PARENTHESES IDENT COLON num RANGE num R_PARENTHESES estmt_or_cstmt
+
+   50 jstmt: RETURN expression SEMICOLON
+   51      | RETURN SEMICOLON
+
+   52 bool_expr: expression
+
+   53 num: IDENT
+   54    | INT_LITERAL
+
+   55 const_expr: INT_LITERAL
+   56           | FLOAT_LITERAL
+   57           | STRING_LITERAL
+   58           | TRUE
+   59           | FALSE
+
+   60 expression: expression ADD expression
+   61           | expression SUB expression
+   62           | expression MUL expression
+   63           | expression DIV expression
+   64           | expression MOD expression
+   65           | expression GT expression
+   66           | expression GE expression
+   67           | expression LT expression
+   68           | expression LE expression
+   69           | expression EQ expression
+   70           | expression NE expression
+   71           | expression AND expression
+   72           | expression OR expression
+   73           | expression ASSIGN expression
+   74           | expression DOUBLE_ADD
+   75           | expression DOUBLE_SUB
+   76           | NOT expression
+   77           | SUB expression
+   78           | L_PARENTHESES expression R_PARENTHESES
+   79           | IDENT
+   80           | literal
+   81           | array_invoke
+   82           | func_invoke
+
+   83 literal: INT_LITERAL
+   84        | FLOAT_LITERAL
+   85        | STRING_LITERAL
+   86        | TRUE
+   87        | FALSE
+
+   88 array_invoke: IDENT dim_expr_list
+
+   89 dim_expr_list: L_SQUARE_BRACKETS expression R_SQUARE_BRACKETS dim_expr_list
+   90              | L_SQUARE_BRACKETS expression R_SQUARE_BRACKETS
+
+   91 func_invoke: IDENT L_PARENTHESES arg_expr_list R_PARENTHESES
+
+   92 arg_expr_list: expression
+   93              | arg_expr_list COMMA expression
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    error (256)
+    DOT (258)
+    RANGE (259) 49
+    COMMA (260) 9 30 93
+    COLON (261) 49
+    SEMICOLON (262) 22 29 34 38 39 40 41 42 48 50 51
+    L_PARENTHESES (263) 6 8 43 44 47 48 49 78 91
+    R_PARENTHESES (264) 6 8 43 44 47 48 49 78 91
+    L_SQUARE_BRACKETS (265) 35 36 89 90
+    R_SQUARE_BRACKETS (266) 35 36 89 90
+    L_BRACKETS (267) 37
+    R_BRACKETS (268) 37
+    DOUBLE_ADD (269) 74
+    DOUBLE_SUB (270) 75
+    MUL (271) 62
+    DIV (272) 63
+    MOD (273) 64
+    ADD (274) 60
+    SUB (275) 61 77
+    LT (276) 67
+    LE (277) 68
+    GT (278) 65
+    GE (279) 66
+    EQ (280) 69
+    NE (281) 70
+    AND (282) 71
+    OR (283) 72
+    TERNARY (284)
+    ASSIGN (285) 22 32 73
+    BOOL (286) 24
+    BREAK (287)
+    CASE (288)
+    CHAR (289)
+    CONST (290) 22
+    CONTINUE (291)
+    DEFAULT (292)
+    DO (293)
+    DOUBLE (294) 28
+    ELSE (295) 44
+    EXTERN (296)
+    FALSE (297) 59 87
+    FLOAT (298) 27
+    FOR (299) 48
+    FOREACH (300) 49
+    IF (301) 43 44
+    INT (302) 25
+    PRINT (303) 38
+    PRINTLN (304) 39
+    READ (305) 40
+    RETURN (306) 50 51
+    SWITCH (307)
+    TRUE (308) 58 86
+    VOID (309) 23
+    WHILE (310) 47
+    STRING (311) 26
+    INT_LITERAL <ival> (312) 35 36 54 55 83
+    FLOAT_LITERAL <fval> (313) 56 84
+    STRING_LITERAL <sval> (314) 57 85
+    IDENT <idname> (315) 6 8 9 10 22 32 33 34 40 49 53 79 88 91
+    NOT (316) 76
+    USUB (317)
+
+
+Nonterminals, with rules where they appear
+
+    $accept (63)
+        on left: 0
+    translation_unit (64)
+        on left: 1 2
+        on right: 0 1
+    external_decl (65)
+        on left: 3 4
+        on right: 1
+    func_def (66)
+        on left: 6 8
+        on right: 3
+    $@1 (67)
+        on left: 5
+        on right: 6
+    $@2 (68)
+        on left: 7
+        on right: 8
+    param_list (69)
+        on left: 9 10
+        on right: 6 9
+    stmts (70)
+        on left: 11 12
+        on right: 11 37
+    stmt (71)
+        on left: 13 14 15 16 17 18
+        on right: 11
+    obj_def (72)
+        on left: 19 20 21
+        on right: 4 13
+    constant_decl (73)
+        on left: 22
+        on right: 19
+    type (74)
+        on left: 23 24 25 26 27 28
+        on right: 6 8 9 10 22 29 34
+    variable_decl (75)
+        on left: 29
+        on right: 20
+    ident_decl_list (76)
+        on left: 30 31
+        on right: 29 30
+    ident_decl (77)
+        on left: 32 33
+        on right: 30 31
+    array_decl (78)
+        on left: 34
+        on right: 21
+    bracket_list (79)
+        on left: 35 36
+        on right: 34 35
+    cstmt (80)
+        on left: 37
+        on right: 6 8 14 46
+    estmt (81)
+        on left: 38 39 40 41 42
+        on right: 15 45
+    sstmt (82)
+        on left: 43 44
+        on right: 16
+    estmt_or_cstmt (83)
+        on left: 45 46
+        on right: 43 44 47 48 49
+    istmt (84)
+        on left: 47 48 49
+        on right: 17
+    jstmt (85)
+        on left: 50 51
+        on right: 18
+    bool_expr (86)
+        on left: 52
+        on right: 43 44 47
+    num (87)
+        on left: 53 54
+        on right: 49
+    const_expr (88)
+        on left: 55 56 57 58 59
+        on right: 22 32
+    expression (89)
+        on left: 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82
+        on right: 38 39 41 48 50 52 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 89 90 92 93
+    literal (90)
+        on left: 83 84 85 86 87
+        on right: 80
+    array_invoke (91)
+        on left: 88
+        on right: 81
+    dim_expr_list (92)
+        on left: 89 90
+        on right: 88 89
+    func_invoke (93)
+        on left: 91
+        on right: 82
+    arg_expr_list (94)
+        on left: 92 93
+        on right: 91 93
+
+
+State 0
+
+    0 $accept: • translation_unit $end
+
+    $default  reduce using rule 2 (translation_unit)
+
+    translation_unit  go to state 1
+
+
+State 1
+
+    0 $accept: translation_unit • $end
+    1 translation_unit: translation_unit • external_decl
+
+    $end    shift, and go to state 2
+    BOOL    shift, and go to state 3
+    CONST   shift, and go to state 4
+    DOUBLE  shift, and go to state 5
+    FLOAT   shift, and go to state 6
+    INT     shift, and go to state 7
+    VOID    shift, and go to state 8
+    STRING  shift, and go to state 9
+
+    external_decl  go to state 10
+    func_def       go to state 11
+    obj_def        go to state 12
+    constant_decl  go to state 13
+    type           go to state 14
+    variable_decl  go to state 15
+    array_decl     go to state 16
+
+
+State 2
+
+    0 $accept: translation_unit $end •
+
+    $default  accept
+
+
+State 3
+
+   24 type: BOOL •
+
+    $default  reduce using rule 24 (type)
+
+
+State 4
+
+   22 constant_decl: CONST • type IDENT ASSIGN const_expr SEMICOLON
+
+    BOOL    shift, and go to state 3
+    DOUBLE  shift, and go to state 5
+    FLOAT   shift, and go to state 6
+    INT     shift, and go to state 7
+    VOID    shift, and go to state 8
+    STRING  shift, and go to state 9
+
+    type  go to state 17
+
+
+State 5
+
+   28 type: DOUBLE •
+
+    $default  reduce using rule 28 (type)
+
+
+State 6
+
+   27 type: FLOAT •
+
+    $default  reduce using rule 27 (type)
+
+
+State 7
+
+   25 type: INT •
+
+    $default  reduce using rule 25 (type)
+
+
+State 8
+
+   23 type: VOID •
+
+    $default  reduce using rule 23 (type)
+
+
+State 9
+
+   26 type: STRING •
+
+    $default  reduce using rule 26 (type)
+
+
+State 10
+
+    1 translation_unit: translation_unit external_decl •
+
+    $default  reduce using rule 1 (translation_unit)
+
+
+State 11
+
+    3 external_decl: func_def •
+
+    $default  reduce using rule 3 (external_decl)
+
+
+State 12
+
+    4 external_decl: obj_def •
+
+    $default  reduce using rule 4 (external_decl)
+
+
+State 13
+
+   19 obj_def: constant_decl •
+
+    $default  reduce using rule 19 (obj_def)
+
+
+State 14
+
+    6 func_def: type • IDENT L_PARENTHESES param_list R_PARENTHESES $@1 cstmt
+    8         | type • IDENT L_PARENTHESES R_PARENTHESES cstmt $@2 cstmt
+   29 variable_decl: type • ident_decl_list SEMICOLON
+   34 array_decl: type • IDENT bracket_list SEMICOLON
+
+    IDENT  shift, and go to state 18
+
+    ident_decl_list  go to state 19
+    ident_decl       go to state 20
+
+
+State 15
+
+   20 obj_def: variable_decl •
+
+    $default  reduce using rule 20 (obj_def)
+
+
+State 16
+
+   21 obj_def: array_decl •
+
+    $default  reduce using rule 21 (obj_def)
+
+
+State 17
+
+   22 constant_decl: CONST type • IDENT ASSIGN const_expr SEMICOLON
+
+    IDENT  shift, and go to state 21
+
+
+State 18
+
+    6 func_def: type IDENT • L_PARENTHESES param_list R_PARENTHESES $@1 cstmt
+    8         | type IDENT • L_PARENTHESES R_PARENTHESES cstmt $@2 cstmt
+   32 ident_decl: IDENT • ASSIGN const_expr
+   33           | IDENT •
+   34 array_decl: type IDENT • bracket_list SEMICOLON
+
+    L_PARENTHESES      shift, and go to state 22
+    L_SQUARE_BRACKETS  shift, and go to state 23
+    ASSIGN             shift, and go to state 24
+
+    $default  reduce using rule 33 (ident_decl)
+
+    bracket_list  go to state 25
+
+
+State 19
+
+   29 variable_decl: type ident_decl_list • SEMICOLON
+
+    SEMICOLON  shift, and go to state 26
+
+
+State 20
+
+   30 ident_decl_list: ident_decl • COMMA ident_decl_list
+   31                | ident_decl •
+
+    COMMA  shift, and go to state 27
+
+    $default  reduce using rule 31 (ident_decl_list)
+
+
+State 21
+
+   22 constant_decl: CONST type IDENT • ASSIGN const_expr SEMICOLON
+
+    ASSIGN  shift, and go to state 28
+
+
+State 22
+
+    6 func_def: type IDENT L_PARENTHESES • param_list R_PARENTHESES $@1 cstmt
+    8         | type IDENT L_PARENTHESES • R_PARENTHESES cstmt $@2 cstmt
+
+    R_PARENTHESES  shift, and go to state 29
+    BOOL           shift, and go to state 3
+    DOUBLE         shift, and go to state 5
+    FLOAT          shift, and go to state 6
+    INT            shift, and go to state 7
+    VOID           shift, and go to state 8
+    STRING         shift, and go to state 9
+
+    param_list  go to state 30
+    type        go to state 31
+
+
+State 23
+
+   35 bracket_list: L_SQUARE_BRACKETS • INT_LITERAL R_SQUARE_BRACKETS bracket_list
+   36             | L_SQUARE_BRACKETS • INT_LITERAL R_SQUARE_BRACKETS
+
+    INT_LITERAL  shift, and go to state 32
+
+
+State 24
+
+   32 ident_decl: IDENT ASSIGN • const_expr
+
+    FALSE           shift, and go to state 33
+    TRUE            shift, and go to state 34
+    INT_LITERAL     shift, and go to state 35
+    FLOAT_LITERAL   shift, and go to state 36
+    STRING_LITERAL  shift, and go to state 37
+
+    const_expr  go to state 38
+
+
+State 25
+
+   34 array_decl: type IDENT bracket_list • SEMICOLON
+
+    SEMICOLON  shift, and go to state 39
+
+
+State 26
+
+   29 variable_decl: type ident_decl_list SEMICOLON •
+
+    $default  reduce using rule 29 (variable_decl)
+
+
+State 27
+
+   30 ident_decl_list: ident_decl COMMA • ident_decl_list
+
+    IDENT  shift, and go to state 40
+
+    ident_decl_list  go to state 41
+    ident_decl       go to state 20
+
+
+State 28
+
+   22 constant_decl: CONST type IDENT ASSIGN • const_expr SEMICOLON
+
+    FALSE           shift, and go to state 33
+    TRUE            shift, and go to state 34
+    INT_LITERAL     shift, and go to state 35
+    FLOAT_LITERAL   shift, and go to state 36
+    STRING_LITERAL  shift, and go to state 37
+
+    const_expr  go to state 42
+
+
+State 29
+
+    8 func_def: type IDENT L_PARENTHESES R_PARENTHESES • cstmt $@2 cstmt
+
+    L_BRACKETS  shift, and go to state 43
+
+    cstmt  go to state 44
+
+
+State 30
+
+    6 func_def: type IDENT L_PARENTHESES param_list • R_PARENTHESES $@1 cstmt
+
+    R_PARENTHESES  shift, and go to state 45
+
+
+State 31
+
+    9 param_list: type • IDENT COMMA param_list
+   10           | type • IDENT
+
+    IDENT  shift, and go to state 46
+
+
+State 32
+
+   35 bracket_list: L_SQUARE_BRACKETS INT_LITERAL • R_SQUARE_BRACKETS bracket_list
+   36             | L_SQUARE_BRACKETS INT_LITERAL • R_SQUARE_BRACKETS
+
+    R_SQUARE_BRACKETS  shift, and go to state 47
+
+
+State 33
+
+   59 const_expr: FALSE •
+
+    $default  reduce using rule 59 (const_expr)
+
+
+State 34
+
+   58 const_expr: TRUE •
+
+    $default  reduce using rule 58 (const_expr)
+
+
+State 35
+
+   55 const_expr: INT_LITERAL •
+
+    $default  reduce using rule 55 (const_expr)
+
+
+State 36
+
+   56 const_expr: FLOAT_LITERAL •
+
+    $default  reduce using rule 56 (const_expr)
+
+
+State 37
+
+   57 const_expr: STRING_LITERAL •
+
+    $default  reduce using rule 57 (const_expr)
+
+
+State 38
+
+   32 ident_decl: IDENT ASSIGN const_expr •
+
+    $default  reduce using rule 32 (ident_decl)
+
+
+State 39
+
+   34 array_decl: type IDENT bracket_list SEMICOLON •
+
+    $default  reduce using rule 34 (array_decl)
+
+
+State 40
+
+   32 ident_decl: IDENT • ASSIGN const_expr
+   33           | IDENT •
+
+    ASSIGN  shift, and go to state 24
+
+    $default  reduce using rule 33 (ident_decl)
+
+
+State 41
+
+   30 ident_decl_list: ident_decl COMMA ident_decl_list •
+
+    $default  reduce using rule 30 (ident_decl_list)
+
+
+State 42
+
+   22 constant_decl: CONST type IDENT ASSIGN const_expr • SEMICOLON
+
+    SEMICOLON  shift, and go to state 48
+
+
+State 43
+
+   37 cstmt: L_BRACKETS • stmts R_BRACKETS
+
+    $default  reduce using rule 12 (stmts)
+
+    stmts  go to state 49
+
+
+State 44
+
+    8 func_def: type IDENT L_PARENTHESES R_PARENTHESES cstmt • $@2 cstmt
+
+    $default  reduce using rule 7 ($@2)
+
+    $@2  go to state 50
+
+
+State 45
+
+    6 func_def: type IDENT L_PARENTHESES param_list R_PARENTHESES • $@1 cstmt
+
+    $default  reduce using rule 5 ($@1)
+
+    $@1  go to state 51
+
+
+State 46
+
+    9 param_list: type IDENT • COMMA param_list
+   10           | type IDENT •
+
+    COMMA  shift, and go to state 52
+
+    $default  reduce using rule 10 (param_list)
+
+
+State 47
+
+   35 bracket_list: L_SQUARE_BRACKETS INT_LITERAL R_SQUARE_BRACKETS • bracket_list
+   36             | L_SQUARE_BRACKETS INT_LITERAL R_SQUARE_BRACKETS •
+
+    L_SQUARE_BRACKETS  shift, and go to state 23
+
+    $default  reduce using rule 36 (bracket_list)
+
+    bracket_list  go to state 53
+
+
+State 48
+
+   22 constant_decl: CONST type IDENT ASSIGN const_expr SEMICOLON •
+
+    $default  reduce using rule 22 (constant_decl)
+
+
+State 49
+
+   11 stmts: stmts • stmt
+   37 cstmt: L_BRACKETS stmts • R_BRACKETS
+
+    SEMICOLON       shift, and go to state 54
+    L_PARENTHESES   shift, and go to state 55
+    L_BRACKETS      shift, and go to state 43
+    R_BRACKETS      shift, and go to state 56
+    SUB             shift, and go to state 57
+    BOOL            shift, and go to state 3
+    CONST           shift, and go to state 4
+    DOUBLE          shift, and go to state 5
+    FALSE           shift, and go to state 58
+    FLOAT           shift, and go to state 6
+    FOR             shift, and go to state 59
+    FOREACH         shift, and go to state 60
+    IF              shift, and go to state 61
+    INT             shift, and go to state 7
+    PRINT           shift, and go to state 62
+    PRINTLN         shift, and go to state 63
+    READ            shift, and go to state 64
+    RETURN          shift, and go to state 65
+    TRUE            shift, and go to state 66
+    VOID            shift, and go to state 8
+    WHILE           shift, and go to state 67
+    STRING          shift, and go to state 9
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    stmt           go to state 73
+    obj_def        go to state 74
+    constant_decl  go to state 13
+    type           go to state 75
+    variable_decl  go to state 15
+    array_decl     go to state 16
+    cstmt          go to state 76
+    estmt          go to state 77
+    sstmt          go to state 78
+    istmt          go to state 79
+    jstmt          go to state 80
+    expression     go to state 81
+    literal        go to state 82
+    array_invoke   go to state 83
+    func_invoke    go to state 84
+
+
+State 50
+
+    8 func_def: type IDENT L_PARENTHESES R_PARENTHESES cstmt $@2 • cstmt
+
+    L_BRACKETS  shift, and go to state 43
+
+    cstmt  go to state 85
+
+
+State 51
+
+    6 func_def: type IDENT L_PARENTHESES param_list R_PARENTHESES $@1 • cstmt
+
+    L_BRACKETS  shift, and go to state 43
+
+    cstmt  go to state 86
+
+
+State 52
+
+    9 param_list: type IDENT COMMA • param_list
+
+    BOOL    shift, and go to state 3
+    DOUBLE  shift, and go to state 5
+    FLOAT   shift, and go to state 6
+    INT     shift, and go to state 7
+    VOID    shift, and go to state 8
+    STRING  shift, and go to state 9
+
+    param_list  go to state 87
+    type        go to state 31
+
+
+State 53
+
+   35 bracket_list: L_SQUARE_BRACKETS INT_LITERAL R_SQUARE_BRACKETS bracket_list •
+
+    $default  reduce using rule 35 (bracket_list)
+
+
+State 54
+
+   42 estmt: SEMICOLON •
+
+    $default  reduce using rule 42 (estmt)
+
+
+State 55
+
+   78 expression: L_PARENTHESES • expression R_PARENTHESES
+
+    L_PARENTHESES   shift, and go to state 55
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    expression    go to state 88
+    literal       go to state 82
+    array_invoke  go to state 83
+    func_invoke   go to state 84
+
+
+State 56
+
+   37 cstmt: L_BRACKETS stmts R_BRACKETS •
+
+    $default  reduce using rule 37 (cstmt)
+
+
+State 57
+
+   77 expression: SUB • expression
+
+    L_PARENTHESES   shift, and go to state 55
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    expression    go to state 89
+    literal       go to state 82
+    array_invoke  go to state 83
+    func_invoke   go to state 84
+
+
+State 58
+
+   87 literal: FALSE •
+
+    $default  reduce using rule 87 (literal)
+
+
+State 59
+
+   48 istmt: FOR • L_PARENTHESES expression SEMICOLON expression SEMICOLON expression R_PARENTHESES estmt_or_cstmt
+
+    L_PARENTHESES  shift, and go to state 90
+
+
+State 60
+
+   49 istmt: FOREACH • L_PARENTHESES IDENT COLON num RANGE num R_PARENTHESES estmt_or_cstmt
+
+    L_PARENTHESES  shift, and go to state 91
+
+
+State 61
+
+   43 sstmt: IF • L_PARENTHESES bool_expr R_PARENTHESES estmt_or_cstmt
+   44      | IF • L_PARENTHESES bool_expr R_PARENTHESES estmt_or_cstmt ELSE estmt_or_cstmt
+
+    L_PARENTHESES  shift, and go to state 92
+
+
+State 62
+
+   38 estmt: PRINT • expression SEMICOLON
+
+    L_PARENTHESES   shift, and go to state 55
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    expression    go to state 93
+    literal       go to state 82
+    array_invoke  go to state 83
+    func_invoke   go to state 84
+
+
+State 63
+
+   39 estmt: PRINTLN • expression SEMICOLON
+
+    L_PARENTHESES   shift, and go to state 55
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    expression    go to state 94
+    literal       go to state 82
+    array_invoke  go to state 83
+    func_invoke   go to state 84
+
+
+State 64
+
+   40 estmt: READ • IDENT SEMICOLON
+
+    IDENT  shift, and go to state 95
+
+
+State 65
+
+   50 jstmt: RETURN • expression SEMICOLON
+   51      | RETURN • SEMICOLON
+
+    SEMICOLON       shift, and go to state 96
+    L_PARENTHESES   shift, and go to state 55
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    expression    go to state 97
+    literal       go to state 82
+    array_invoke  go to state 83
+    func_invoke   go to state 84
+
+
+State 66
+
+   86 literal: TRUE •
+
+    $default  reduce using rule 86 (literal)
+
+
+State 67
+
+   47 istmt: WHILE • L_PARENTHESES bool_expr R_PARENTHESES estmt_or_cstmt
+
+    L_PARENTHESES  shift, and go to state 98
+
+
+State 68
+
+   83 literal: INT_LITERAL •
+
+    $default  reduce using rule 83 (literal)
+
+
+State 69
+
+   84 literal: FLOAT_LITERAL •
+
+    $default  reduce using rule 84 (literal)
+
+
+State 70
+
+   85 literal: STRING_LITERAL •
+
+    $default  reduce using rule 85 (literal)
+
+
+State 71
+
+   79 expression: IDENT •
+   88 array_invoke: IDENT • dim_expr_list
+   91 func_invoke: IDENT • L_PARENTHESES arg_expr_list R_PARENTHESES
+
+    L_PARENTHESES      shift, and go to state 99
+    L_SQUARE_BRACKETS  shift, and go to state 100
+
+    $default  reduce using rule 79 (expression)
+
+    dim_expr_list  go to state 101
+
+
+State 72
+
+   76 expression: NOT • expression
+
+    L_PARENTHESES   shift, and go to state 55
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    expression    go to state 102
+    literal       go to state 82
+    array_invoke  go to state 83
+    func_invoke   go to state 84
+
+
+State 73
+
+   11 stmts: stmts stmt •
+
+    $default  reduce using rule 11 (stmts)
+
+
+State 74
+
+   13 stmt: obj_def •
+
+    $default  reduce using rule 13 (stmt)
+
+
+State 75
+
+   29 variable_decl: type • ident_decl_list SEMICOLON
+   34 array_decl: type • IDENT bracket_list SEMICOLON
+
+    IDENT  shift, and go to state 103
+
+    ident_decl_list  go to state 19
+    ident_decl       go to state 20
+
+
+State 76
+
+   14 stmt: cstmt •
+
+    $default  reduce using rule 14 (stmt)
+
+
+State 77
+
+   15 stmt: estmt •
+
+    $default  reduce using rule 15 (stmt)
+
+
+State 78
+
+   16 stmt: sstmt •
+
+    $default  reduce using rule 16 (stmt)
+
+
+State 79
+
+   17 stmt: istmt •
+
+    $default  reduce using rule 17 (stmt)
+
+
+State 80
+
+   18 stmt: jstmt •
+
+    $default  reduce using rule 18 (stmt)
+
+
+State 81
+
+   41 estmt: expression • SEMICOLON
+   60 expression: expression • ADD expression
+   61           | expression • SUB expression
+   62           | expression • MUL expression
+   63           | expression • DIV expression
+   64           | expression • MOD expression
+   65           | expression • GT expression
+   66           | expression • GE expression
+   67           | expression • LT expression
+   68           | expression • LE expression
+   69           | expression • EQ expression
+   70           | expression • NE expression
+   71           | expression • AND expression
+   72           | expression • OR expression
+   73           | expression • ASSIGN expression
+   74           | expression • DOUBLE_ADD
+   75           | expression • DOUBLE_SUB
+
+    SEMICOLON   shift, and go to state 104
+    DOUBLE_ADD  shift, and go to state 105
+    DOUBLE_SUB  shift, and go to state 106
+    MUL         shift, and go to state 107
+    DIV         shift, and go to state 108
+    MOD         shift, and go to state 109
+    ADD         shift, and go to state 110
+    SUB         shift, and go to state 111
+    LT          shift, and go to state 112
+    LE          shift, and go to state 113
+    GT          shift, and go to state 114
+    GE          shift, and go to state 115
+    EQ          shift, and go to state 116
+    NE          shift, and go to state 117
+    AND         shift, and go to state 118
+    OR          shift, and go to state 119
+    ASSIGN      shift, and go to state 120
+
+
+State 82
+
+   80 expression: literal •
+
+    $default  reduce using rule 80 (expression)
+
+
+State 83
+
+   81 expression: array_invoke •
+
+    $default  reduce using rule 81 (expression)
+
+
+State 84
+
+   82 expression: func_invoke •
+
+    $default  reduce using rule 82 (expression)
+
+
+State 85
+
+    8 func_def: type IDENT L_PARENTHESES R_PARENTHESES cstmt $@2 cstmt •
+
+    $default  reduce using rule 8 (func_def)
+
+
+State 86
+
+    6 func_def: type IDENT L_PARENTHESES param_list R_PARENTHESES $@1 cstmt •
+
+    $default  reduce using rule 6 (func_def)
+
+
+State 87
+
+    9 param_list: type IDENT COMMA param_list •
+
+    $default  reduce using rule 9 (param_list)
+
+
+State 88
+
+   60 expression: expression • ADD expression
+   61           | expression • SUB expression
+   62           | expression • MUL expression
+   63           | expression • DIV expression
+   64           | expression • MOD expression
+   65           | expression • GT expression
+   66           | expression • GE expression
+   67           | expression • LT expression
+   68           | expression • LE expression
+   69           | expression • EQ expression
+   70           | expression • NE expression
+   71           | expression • AND expression
+   72           | expression • OR expression
+   73           | expression • ASSIGN expression
+   74           | expression • DOUBLE_ADD
+   75           | expression • DOUBLE_SUB
+   78           | L_PARENTHESES expression • R_PARENTHESES
+
+    R_PARENTHESES  shift, and go to state 121
+    DOUBLE_ADD     shift, and go to state 105
+    DOUBLE_SUB     shift, and go to state 106
+    MUL            shift, and go to state 107
+    DIV            shift, and go to state 108
+    MOD            shift, and go to state 109
+    ADD            shift, and go to state 110
+    SUB            shift, and go to state 111
+    LT             shift, and go to state 112
+    LE             shift, and go to state 113
+    GT             shift, and go to state 114
+    GE             shift, and go to state 115
+    EQ             shift, and go to state 116
+    NE             shift, and go to state 117
+    AND            shift, and go to state 118
+    OR             shift, and go to state 119
+    ASSIGN         shift, and go to state 120
+
+
+State 89
+
+   60 expression: expression • ADD expression
+   61           | expression • SUB expression
+   62           | expression • MUL expression
+   63           | expression • DIV expression
+   64           | expression • MOD expression
+   65           | expression • GT expression
+   66           | expression • GE expression
+   67           | expression • LT expression
+   68           | expression • LE expression
+   69           | expression • EQ expression
+   70           | expression • NE expression
+   71           | expression • AND expression
+   72           | expression • OR expression
+   73           | expression • ASSIGN expression
+   74           | expression • DOUBLE_ADD
+   75           | expression • DOUBLE_SUB
+   77           | SUB expression •
+
+    DOUBLE_ADD  shift, and go to state 105
+    DOUBLE_SUB  shift, and go to state 106
+
+    $default  reduce using rule 77 (expression)
+
+
+State 90
+
+   48 istmt: FOR L_PARENTHESES • expression SEMICOLON expression SEMICOLON expression R_PARENTHESES estmt_or_cstmt
+
+    L_PARENTHESES   shift, and go to state 55
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    expression    go to state 122
+    literal       go to state 82
+    array_invoke  go to state 83
+    func_invoke   go to state 84
+
+
+State 91
+
+   49 istmt: FOREACH L_PARENTHESES • IDENT COLON num RANGE num R_PARENTHESES estmt_or_cstmt
+
+    IDENT  shift, and go to state 123
+
+
+State 92
+
+   43 sstmt: IF L_PARENTHESES • bool_expr R_PARENTHESES estmt_or_cstmt
+   44      | IF L_PARENTHESES • bool_expr R_PARENTHESES estmt_or_cstmt ELSE estmt_or_cstmt
+
+    L_PARENTHESES   shift, and go to state 55
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    bool_expr     go to state 124
+    expression    go to state 125
+    literal       go to state 82
+    array_invoke  go to state 83
+    func_invoke   go to state 84
+
+
+State 93
+
+   38 estmt: PRINT expression • SEMICOLON
+   60 expression: expression • ADD expression
+   61           | expression • SUB expression
+   62           | expression • MUL expression
+   63           | expression • DIV expression
+   64           | expression • MOD expression
+   65           | expression • GT expression
+   66           | expression • GE expression
+   67           | expression • LT expression
+   68           | expression • LE expression
+   69           | expression • EQ expression
+   70           | expression • NE expression
+   71           | expression • AND expression
+   72           | expression • OR expression
+   73           | expression • ASSIGN expression
+   74           | expression • DOUBLE_ADD
+   75           | expression • DOUBLE_SUB
+
+    SEMICOLON   shift, and go to state 126
+    DOUBLE_ADD  shift, and go to state 105
+    DOUBLE_SUB  shift, and go to state 106
+    MUL         shift, and go to state 107
+    DIV         shift, and go to state 108
+    MOD         shift, and go to state 109
+    ADD         shift, and go to state 110
+    SUB         shift, and go to state 111
+    LT          shift, and go to state 112
+    LE          shift, and go to state 113
+    GT          shift, and go to state 114
+    GE          shift, and go to state 115
+    EQ          shift, and go to state 116
+    NE          shift, and go to state 117
+    AND         shift, and go to state 118
+    OR          shift, and go to state 119
+    ASSIGN      shift, and go to state 120
+
+
+State 94
+
+   39 estmt: PRINTLN expression • SEMICOLON
+   60 expression: expression • ADD expression
+   61           | expression • SUB expression
+   62           | expression • MUL expression
+   63           | expression • DIV expression
+   64           | expression • MOD expression
+   65           | expression • GT expression
+   66           | expression • GE expression
+   67           | expression • LT expression
+   68           | expression • LE expression
+   69           | expression • EQ expression
+   70           | expression • NE expression
+   71           | expression • AND expression
+   72           | expression • OR expression
+   73           | expression • ASSIGN expression
+   74           | expression • DOUBLE_ADD
+   75           | expression • DOUBLE_SUB
+
+    SEMICOLON   shift, and go to state 127
+    DOUBLE_ADD  shift, and go to state 105
+    DOUBLE_SUB  shift, and go to state 106
+    MUL         shift, and go to state 107
+    DIV         shift, and go to state 108
+    MOD         shift, and go to state 109
+    ADD         shift, and go to state 110
+    SUB         shift, and go to state 111
+    LT          shift, and go to state 112
+    LE          shift, and go to state 113
+    GT          shift, and go to state 114
+    GE          shift, and go to state 115
+    EQ          shift, and go to state 116
+    NE          shift, and go to state 117
+    AND         shift, and go to state 118
+    OR          shift, and go to state 119
+    ASSIGN      shift, and go to state 120
+
+
+State 95
+
+   40 estmt: READ IDENT • SEMICOLON
+
+    SEMICOLON  shift, and go to state 128
+
+
+State 96
+
+   51 jstmt: RETURN SEMICOLON •
+
+    $default  reduce using rule 51 (jstmt)
+
+
+State 97
+
+   50 jstmt: RETURN expression • SEMICOLON
+   60 expression: expression • ADD expression
+   61           | expression • SUB expression
+   62           | expression • MUL expression
+   63           | expression • DIV expression
+   64           | expression • MOD expression
+   65           | expression • GT expression
+   66           | expression • GE expression
+   67           | expression • LT expression
+   68           | expression • LE expression
+   69           | expression • EQ expression
+   70           | expression • NE expression
+   71           | expression • AND expression
+   72           | expression • OR expression
+   73           | expression • ASSIGN expression
+   74           | expression • DOUBLE_ADD
+   75           | expression • DOUBLE_SUB
+
+    SEMICOLON   shift, and go to state 129
+    DOUBLE_ADD  shift, and go to state 105
+    DOUBLE_SUB  shift, and go to state 106
+    MUL         shift, and go to state 107
+    DIV         shift, and go to state 108
+    MOD         shift, and go to state 109
+    ADD         shift, and go to state 110
+    SUB         shift, and go to state 111
+    LT          shift, and go to state 112
+    LE          shift, and go to state 113
+    GT          shift, and go to state 114
+    GE          shift, and go to state 115
+    EQ          shift, and go to state 116
+    NE          shift, and go to state 117
+    AND         shift, and go to state 118
+    OR          shift, and go to state 119
+    ASSIGN      shift, and go to state 120
+
+
+State 98
+
+   47 istmt: WHILE L_PARENTHESES • bool_expr R_PARENTHESES estmt_or_cstmt
+
+    L_PARENTHESES   shift, and go to state 55
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    bool_expr     go to state 130
+    expression    go to state 125
+    literal       go to state 82
+    array_invoke  go to state 83
+    func_invoke   go to state 84
+
+
+State 99
+
+   91 func_invoke: IDENT L_PARENTHESES • arg_expr_list R_PARENTHESES
+
+    L_PARENTHESES   shift, and go to state 55
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    expression     go to state 131
+    literal        go to state 82
+    array_invoke   go to state 83
+    func_invoke    go to state 84
+    arg_expr_list  go to state 132
+
+
+State 100
+
+   89 dim_expr_list: L_SQUARE_BRACKETS • expression R_SQUARE_BRACKETS dim_expr_list
+   90              | L_SQUARE_BRACKETS • expression R_SQUARE_BRACKETS
+
+    L_PARENTHESES   shift, and go to state 55
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    expression    go to state 133
+    literal       go to state 82
+    array_invoke  go to state 83
+    func_invoke   go to state 84
+
+
+State 101
+
+   88 array_invoke: IDENT dim_expr_list •
+
+    $default  reduce using rule 88 (array_invoke)
+
+
+State 102
+
+   60 expression: expression • ADD expression
+   61           | expression • SUB expression
+   62           | expression • MUL expression
+   63           | expression • DIV expression
+   64           | expression • MOD expression
+   65           | expression • GT expression
+   66           | expression • GE expression
+   67           | expression • LT expression
+   68           | expression • LE expression
+   69           | expression • EQ expression
+   70           | expression • NE expression
+   71           | expression • AND expression
+   72           | expression • OR expression
+   73           | expression • ASSIGN expression
+   74           | expression • DOUBLE_ADD
+   75           | expression • DOUBLE_SUB
+   76           | NOT expression •
+
+    DOUBLE_ADD  shift, and go to state 105
+    DOUBLE_SUB  shift, and go to state 106
+    MUL         shift, and go to state 107
+    DIV         shift, and go to state 108
+    MOD         shift, and go to state 109
+    ADD         shift, and go to state 110
+    SUB         shift, and go to state 111
+    LT          shift, and go to state 112
+    LE          shift, and go to state 113
+    GT          shift, and go to state 114
+    GE          shift, and go to state 115
+    EQ          shift, and go to state 116
+    NE          shift, and go to state 117
+    ASSIGN      shift, and go to state 120
+
+    $default  reduce using rule 76 (expression)
+
+
+State 103
+
+   32 ident_decl: IDENT • ASSIGN const_expr
+   33           | IDENT •
+   34 array_decl: type IDENT • bracket_list SEMICOLON
+
+    L_SQUARE_BRACKETS  shift, and go to state 23
+    ASSIGN             shift, and go to state 24
+
+    $default  reduce using rule 33 (ident_decl)
+
+    bracket_list  go to state 25
+
+
+State 104
+
+   41 estmt: expression SEMICOLON •
+
+    $default  reduce using rule 41 (estmt)
+
+
+State 105
+
+   74 expression: expression DOUBLE_ADD •
+
+    $default  reduce using rule 74 (expression)
+
+
+State 106
+
+   75 expression: expression DOUBLE_SUB •
+
+    $default  reduce using rule 75 (expression)
+
+
+State 107
+
+   62 expression: expression MUL • expression
+
+    L_PARENTHESES   shift, and go to state 55
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    expression    go to state 134
+    literal       go to state 82
+    array_invoke  go to state 83
+    func_invoke   go to state 84
+
+
+State 108
+
+   63 expression: expression DIV • expression
+
+    L_PARENTHESES   shift, and go to state 55
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    expression    go to state 135
+    literal       go to state 82
+    array_invoke  go to state 83
+    func_invoke   go to state 84
+
+
+State 109
+
+   64 expression: expression MOD • expression
+
+    L_PARENTHESES   shift, and go to state 55
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    expression    go to state 136
+    literal       go to state 82
+    array_invoke  go to state 83
+    func_invoke   go to state 84
+
+
+State 110
+
+   60 expression: expression ADD • expression
+
+    L_PARENTHESES   shift, and go to state 55
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    expression    go to state 137
+    literal       go to state 82
+    array_invoke  go to state 83
+    func_invoke   go to state 84
+
+
+State 111
+
+   61 expression: expression SUB • expression
+
+    L_PARENTHESES   shift, and go to state 55
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    expression    go to state 138
+    literal       go to state 82
+    array_invoke  go to state 83
+    func_invoke   go to state 84
+
+
+State 112
+
+   67 expression: expression LT • expression
+
+    L_PARENTHESES   shift, and go to state 55
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    expression    go to state 139
+    literal       go to state 82
+    array_invoke  go to state 83
+    func_invoke   go to state 84
+
+
+State 113
+
+   68 expression: expression LE • expression
+
+    L_PARENTHESES   shift, and go to state 55
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    expression    go to state 140
+    literal       go to state 82
+    array_invoke  go to state 83
+    func_invoke   go to state 84
+
+
+State 114
+
+   65 expression: expression GT • expression
+
+    L_PARENTHESES   shift, and go to state 55
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    expression    go to state 141
+    literal       go to state 82
+    array_invoke  go to state 83
+    func_invoke   go to state 84
+
+
+State 115
+
+   66 expression: expression GE • expression
+
+    L_PARENTHESES   shift, and go to state 55
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    expression    go to state 142
+    literal       go to state 82
+    array_invoke  go to state 83
+    func_invoke   go to state 84
+
+
+State 116
+
+   69 expression: expression EQ • expression
+
+    L_PARENTHESES   shift, and go to state 55
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    expression    go to state 143
+    literal       go to state 82
+    array_invoke  go to state 83
+    func_invoke   go to state 84
+
+
+State 117
+
+   70 expression: expression NE • expression
+
+    L_PARENTHESES   shift, and go to state 55
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    expression    go to state 144
+    literal       go to state 82
+    array_invoke  go to state 83
+    func_invoke   go to state 84
+
+
+State 118
+
+   71 expression: expression AND • expression
+
+    L_PARENTHESES   shift, and go to state 55
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    expression    go to state 145
+    literal       go to state 82
+    array_invoke  go to state 83
+    func_invoke   go to state 84
+
+
+State 119
+
+   72 expression: expression OR • expression
+
+    L_PARENTHESES   shift, and go to state 55
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    expression    go to state 146
+    literal       go to state 82
+    array_invoke  go to state 83
+    func_invoke   go to state 84
+
+
+State 120
+
+   73 expression: expression ASSIGN • expression
+
+    L_PARENTHESES   shift, and go to state 55
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    expression    go to state 147
+    literal       go to state 82
+    array_invoke  go to state 83
+    func_invoke   go to state 84
+
+
+State 121
+
+   78 expression: L_PARENTHESES expression R_PARENTHESES •
+
+    $default  reduce using rule 78 (expression)
+
+
+State 122
+
+   48 istmt: FOR L_PARENTHESES expression • SEMICOLON expression SEMICOLON expression R_PARENTHESES estmt_or_cstmt
+   60 expression: expression • ADD expression
+   61           | expression • SUB expression
+   62           | expression • MUL expression
+   63           | expression • DIV expression
+   64           | expression • MOD expression
+   65           | expression • GT expression
+   66           | expression • GE expression
+   67           | expression • LT expression
+   68           | expression • LE expression
+   69           | expression • EQ expression
+   70           | expression • NE expression
+   71           | expression • AND expression
+   72           | expression • OR expression
+   73           | expression • ASSIGN expression
+   74           | expression • DOUBLE_ADD
+   75           | expression • DOUBLE_SUB
+
+    SEMICOLON   shift, and go to state 148
+    DOUBLE_ADD  shift, and go to state 105
+    DOUBLE_SUB  shift, and go to state 106
+    MUL         shift, and go to state 107
+    DIV         shift, and go to state 108
+    MOD         shift, and go to state 109
+    ADD         shift, and go to state 110
+    SUB         shift, and go to state 111
+    LT          shift, and go to state 112
+    LE          shift, and go to state 113
+    GT          shift, and go to state 114
+    GE          shift, and go to state 115
+    EQ          shift, and go to state 116
+    NE          shift, and go to state 117
+    AND         shift, and go to state 118
+    OR          shift, and go to state 119
+    ASSIGN      shift, and go to state 120
+
+
+State 123
+
+   49 istmt: FOREACH L_PARENTHESES IDENT • COLON num RANGE num R_PARENTHESES estmt_or_cstmt
+
+    COLON  shift, and go to state 149
+
+
+State 124
+
+   43 sstmt: IF L_PARENTHESES bool_expr • R_PARENTHESES estmt_or_cstmt
+   44      | IF L_PARENTHESES bool_expr • R_PARENTHESES estmt_or_cstmt ELSE estmt_or_cstmt
+
+    R_PARENTHESES  shift, and go to state 150
+
+
+State 125
+
+   52 bool_expr: expression •
+   60 expression: expression • ADD expression
+   61           | expression • SUB expression
+   62           | expression • MUL expression
+   63           | expression • DIV expression
+   64           | expression • MOD expression
+   65           | expression • GT expression
+   66           | expression • GE expression
+   67           | expression • LT expression
+   68           | expression • LE expression
+   69           | expression • EQ expression
+   70           | expression • NE expression
+   71           | expression • AND expression
+   72           | expression • OR expression
+   73           | expression • ASSIGN expression
+   74           | expression • DOUBLE_ADD
+   75           | expression • DOUBLE_SUB
+
+    DOUBLE_ADD  shift, and go to state 105
+    DOUBLE_SUB  shift, and go to state 106
+    MUL         shift, and go to state 107
+    DIV         shift, and go to state 108
+    MOD         shift, and go to state 109
+    ADD         shift, and go to state 110
+    SUB         shift, and go to state 111
+    LT          shift, and go to state 112
+    LE          shift, and go to state 113
+    GT          shift, and go to state 114
+    GE          shift, and go to state 115
+    EQ          shift, and go to state 116
+    NE          shift, and go to state 117
+    AND         shift, and go to state 118
+    OR          shift, and go to state 119
+    ASSIGN      shift, and go to state 120
+
+    $default  reduce using rule 52 (bool_expr)
+
+
+State 126
+
+   38 estmt: PRINT expression SEMICOLON •
+
+    $default  reduce using rule 38 (estmt)
+
+
+State 127
+
+   39 estmt: PRINTLN expression SEMICOLON •
+
+    $default  reduce using rule 39 (estmt)
+
+
+State 128
+
+   40 estmt: READ IDENT SEMICOLON •
+
+    $default  reduce using rule 40 (estmt)
+
+
+State 129
+
+   50 jstmt: RETURN expression SEMICOLON •
+
+    $default  reduce using rule 50 (jstmt)
+
+
+State 130
+
+   47 istmt: WHILE L_PARENTHESES bool_expr • R_PARENTHESES estmt_or_cstmt
+
+    R_PARENTHESES  shift, and go to state 151
+
+
+State 131
+
+   60 expression: expression • ADD expression
+   61           | expression • SUB expression
+   62           | expression • MUL expression
+   63           | expression • DIV expression
+   64           | expression • MOD expression
+   65           | expression • GT expression
+   66           | expression • GE expression
+   67           | expression • LT expression
+   68           | expression • LE expression
+   69           | expression • EQ expression
+   70           | expression • NE expression
+   71           | expression • AND expression
+   72           | expression • OR expression
+   73           | expression • ASSIGN expression
+   74           | expression • DOUBLE_ADD
+   75           | expression • DOUBLE_SUB
+   92 arg_expr_list: expression •
+
+    DOUBLE_ADD  shift, and go to state 105
+    DOUBLE_SUB  shift, and go to state 106
+    MUL         shift, and go to state 107
+    DIV         shift, and go to state 108
+    MOD         shift, and go to state 109
+    ADD         shift, and go to state 110
+    SUB         shift, and go to state 111
+    LT          shift, and go to state 112
+    LE          shift, and go to state 113
+    GT          shift, and go to state 114
+    GE          shift, and go to state 115
+    EQ          shift, and go to state 116
+    NE          shift, and go to state 117
+    AND         shift, and go to state 118
+    OR          shift, and go to state 119
+    ASSIGN      shift, and go to state 120
+
+    $default  reduce using rule 92 (arg_expr_list)
+
+
+State 132
+
+   91 func_invoke: IDENT L_PARENTHESES arg_expr_list • R_PARENTHESES
+   93 arg_expr_list: arg_expr_list • COMMA expression
+
+    COMMA          shift, and go to state 152
+    R_PARENTHESES  shift, and go to state 153
+
+
+State 133
+
+   60 expression: expression • ADD expression
+   61           | expression • SUB expression
+   62           | expression • MUL expression
+   63           | expression • DIV expression
+   64           | expression • MOD expression
+   65           | expression • GT expression
+   66           | expression • GE expression
+   67           | expression • LT expression
+   68           | expression • LE expression
+   69           | expression • EQ expression
+   70           | expression • NE expression
+   71           | expression • AND expression
+   72           | expression • OR expression
+   73           | expression • ASSIGN expression
+   74           | expression • DOUBLE_ADD
+   75           | expression • DOUBLE_SUB
+   89 dim_expr_list: L_SQUARE_BRACKETS expression • R_SQUARE_BRACKETS dim_expr_list
+   90              | L_SQUARE_BRACKETS expression • R_SQUARE_BRACKETS
+
+    R_SQUARE_BRACKETS  shift, and go to state 154
+    DOUBLE_ADD         shift, and go to state 105
+    DOUBLE_SUB         shift, and go to state 106
+    MUL                shift, and go to state 107
+    DIV                shift, and go to state 108
+    MOD                shift, and go to state 109
+    ADD                shift, and go to state 110
+    SUB                shift, and go to state 111
+    LT                 shift, and go to state 112
+    LE                 shift, and go to state 113
+    GT                 shift, and go to state 114
+    GE                 shift, and go to state 115
+    EQ                 shift, and go to state 116
+    NE                 shift, and go to state 117
+    AND                shift, and go to state 118
+    OR                 shift, and go to state 119
+    ASSIGN             shift, and go to state 120
+
+
+State 134
+
+   60 expression: expression • ADD expression
+   61           | expression • SUB expression
+   62           | expression • MUL expression
+   62           | expression MUL expression •
+   63           | expression • DIV expression
+   64           | expression • MOD expression
+   65           | expression • GT expression
+   66           | expression • GE expression
+   67           | expression • LT expression
+   68           | expression • LE expression
+   69           | expression • EQ expression
+   70           | expression • NE expression
+   71           | expression • AND expression
+   72           | expression • OR expression
+   73           | expression • ASSIGN expression
+   74           | expression • DOUBLE_ADD
+   75           | expression • DOUBLE_SUB
+
+    DOUBLE_ADD  shift, and go to state 105
+    DOUBLE_SUB  shift, and go to state 106
+
+    $default  reduce using rule 62 (expression)
+
+
+State 135
+
+   60 expression: expression • ADD expression
+   61           | expression • SUB expression
+   62           | expression • MUL expression
+   63           | expression • DIV expression
+   63           | expression DIV expression •
+   64           | expression • MOD expression
+   65           | expression • GT expression
+   66           | expression • GE expression
+   67           | expression • LT expression
+   68           | expression • LE expression
+   69           | expression • EQ expression
+   70           | expression • NE expression
+   71           | expression • AND expression
+   72           | expression • OR expression
+   73           | expression • ASSIGN expression
+   74           | expression • DOUBLE_ADD
+   75           | expression • DOUBLE_SUB
+
+    DOUBLE_ADD  shift, and go to state 105
+    DOUBLE_SUB  shift, and go to state 106
+
+    $default  reduce using rule 63 (expression)
+
+
+State 136
+
+   60 expression: expression • ADD expression
+   61           | expression • SUB expression
+   62           | expression • MUL expression
+   63           | expression • DIV expression
+   64           | expression • MOD expression
+   64           | expression MOD expression •
+   65           | expression • GT expression
+   66           | expression • GE expression
+   67           | expression • LT expression
+   68           | expression • LE expression
+   69           | expression • EQ expression
+   70           | expression • NE expression
+   71           | expression • AND expression
+   72           | expression • OR expression
+   73           | expression • ASSIGN expression
+   74           | expression • DOUBLE_ADD
+   75           | expression • DOUBLE_SUB
+
+    DOUBLE_ADD  shift, and go to state 105
+    DOUBLE_SUB  shift, and go to state 106
+
+    $default  reduce using rule 64 (expression)
+
+
+State 137
+
+   60 expression: expression • ADD expression
+   60           | expression ADD expression •
+   61           | expression • SUB expression
+   62           | expression • MUL expression
+   63           | expression • DIV expression
+   64           | expression • MOD expression
+   65           | expression • GT expression
+   66           | expression • GE expression
+   67           | expression • LT expression
+   68           | expression • LE expression
+   69           | expression • EQ expression
+   70           | expression • NE expression
+   71           | expression • AND expression
+   72           | expression • OR expression
+   73           | expression • ASSIGN expression
+   74           | expression • DOUBLE_ADD
+   75           | expression • DOUBLE_SUB
+
+    DOUBLE_ADD  shift, and go to state 105
+    DOUBLE_SUB  shift, and go to state 106
+    MUL         shift, and go to state 107
+    DIV         shift, and go to state 108
+    MOD         shift, and go to state 109
+
+    $default  reduce using rule 60 (expression)
+
+
+State 138
+
+   60 expression: expression • ADD expression
+   61           | expression • SUB expression
+   61           | expression SUB expression •
+   62           | expression • MUL expression
+   63           | expression • DIV expression
+   64           | expression • MOD expression
+   65           | expression • GT expression
+   66           | expression • GE expression
+   67           | expression • LT expression
+   68           | expression • LE expression
+   69           | expression • EQ expression
+   70           | expression • NE expression
+   71           | expression • AND expression
+   72           | expression • OR expression
+   73           | expression • ASSIGN expression
+   74           | expression • DOUBLE_ADD
+   75           | expression • DOUBLE_SUB
+
+    DOUBLE_ADD  shift, and go to state 105
+    DOUBLE_SUB  shift, and go to state 106
+    MUL         shift, and go to state 107
+    DIV         shift, and go to state 108
+    MOD         shift, and go to state 109
+
+    $default  reduce using rule 61 (expression)
+
+
+State 139
+
+   60 expression: expression • ADD expression
+   61           | expression • SUB expression
+   62           | expression • MUL expression
+   63           | expression • DIV expression
+   64           | expression • MOD expression
+   65           | expression • GT expression
+   66           | expression • GE expression
+   67           | expression • LT expression
+   67           | expression LT expression •
+   68           | expression • LE expression
+   69           | expression • EQ expression
+   70           | expression • NE expression
+   71           | expression • AND expression
+   72           | expression • OR expression
+   73           | expression • ASSIGN expression
+   74           | expression • DOUBLE_ADD
+   75           | expression • DOUBLE_SUB
+
+    DOUBLE_ADD  shift, and go to state 105
+    DOUBLE_SUB  shift, and go to state 106
+    MUL         shift, and go to state 107
+    DIV         shift, and go to state 108
+    MOD         shift, and go to state 109
+    ADD         shift, and go to state 110
+    SUB         shift, and go to state 111
+    EQ          shift, and go to state 116
+    NE          shift, and go to state 117
+
+    $default  reduce using rule 67 (expression)
+
+
+State 140
+
+   60 expression: expression • ADD expression
+   61           | expression • SUB expression
+   62           | expression • MUL expression
+   63           | expression • DIV expression
+   64           | expression • MOD expression
+   65           | expression • GT expression
+   66           | expression • GE expression
+   67           | expression • LT expression
+   68           | expression • LE expression
+   68           | expression LE expression •
+   69           | expression • EQ expression
+   70           | expression • NE expression
+   71           | expression • AND expression
+   72           | expression • OR expression
+   73           | expression • ASSIGN expression
+   74           | expression • DOUBLE_ADD
+   75           | expression • DOUBLE_SUB
+
+    DOUBLE_ADD  shift, and go to state 105
+    DOUBLE_SUB  shift, and go to state 106
+    MUL         shift, and go to state 107
+    DIV         shift, and go to state 108
+    MOD         shift, and go to state 109
+    ADD         shift, and go to state 110
+    SUB         shift, and go to state 111
+    EQ          shift, and go to state 116
+    NE          shift, and go to state 117
+
+    $default  reduce using rule 68 (expression)
+
+
+State 141
+
+   60 expression: expression • ADD expression
+   61           | expression • SUB expression
+   62           | expression • MUL expression
+   63           | expression • DIV expression
+   64           | expression • MOD expression
+   65           | expression • GT expression
+   65           | expression GT expression •
+   66           | expression • GE expression
+   67           | expression • LT expression
+   68           | expression • LE expression
+   69           | expression • EQ expression
+   70           | expression • NE expression
+   71           | expression • AND expression
+   72           | expression • OR expression
+   73           | expression • ASSIGN expression
+   74           | expression • DOUBLE_ADD
+   75           | expression • DOUBLE_SUB
+
+    DOUBLE_ADD  shift, and go to state 105
+    DOUBLE_SUB  shift, and go to state 106
+    MUL         shift, and go to state 107
+    DIV         shift, and go to state 108
+    MOD         shift, and go to state 109
+    ADD         shift, and go to state 110
+    SUB         shift, and go to state 111
+    EQ          shift, and go to state 116
+    NE          shift, and go to state 117
+
+    $default  reduce using rule 65 (expression)
+
+
+State 142
+
+   60 expression: expression • ADD expression
+   61           | expression • SUB expression
+   62           | expression • MUL expression
+   63           | expression • DIV expression
+   64           | expression • MOD expression
+   65           | expression • GT expression
+   66           | expression • GE expression
+   66           | expression GE expression •
+   67           | expression • LT expression
+   68           | expression • LE expression
+   69           | expression • EQ expression
+   70           | expression • NE expression
+   71           | expression • AND expression
+   72           | expression • OR expression
+   73           | expression • ASSIGN expression
+   74           | expression • DOUBLE_ADD
+   75           | expression • DOUBLE_SUB
+
+    DOUBLE_ADD  shift, and go to state 105
+    DOUBLE_SUB  shift, and go to state 106
+    MUL         shift, and go to state 107
+    DIV         shift, and go to state 108
+    MOD         shift, and go to state 109
+    ADD         shift, and go to state 110
+    SUB         shift, and go to state 111
+    EQ          shift, and go to state 116
+    NE          shift, and go to state 117
+
+    $default  reduce using rule 66 (expression)
+
+
+State 143
+
+   60 expression: expression • ADD expression
+   61           | expression • SUB expression
+   62           | expression • MUL expression
+   63           | expression • DIV expression
+   64           | expression • MOD expression
+   65           | expression • GT expression
+   66           | expression • GE expression
+   67           | expression • LT expression
+   68           | expression • LE expression
+   69           | expression • EQ expression
+   69           | expression EQ expression •
+   70           | expression • NE expression
+   71           | expression • AND expression
+   72           | expression • OR expression
+   73           | expression • ASSIGN expression
+   74           | expression • DOUBLE_ADD
+   75           | expression • DOUBLE_SUB
+
+    DOUBLE_ADD  shift, and go to state 105
+    DOUBLE_SUB  shift, and go to state 106
+    MUL         shift, and go to state 107
+    DIV         shift, and go to state 108
+    MOD         shift, and go to state 109
+    ADD         shift, and go to state 110
+    SUB         shift, and go to state 111
+
+    $default  reduce using rule 69 (expression)
+
+
+State 144
+
+   60 expression: expression • ADD expression
+   61           | expression • SUB expression
+   62           | expression • MUL expression
+   63           | expression • DIV expression
+   64           | expression • MOD expression
+   65           | expression • GT expression
+   66           | expression • GE expression
+   67           | expression • LT expression
+   68           | expression • LE expression
+   69           | expression • EQ expression
+   70           | expression • NE expression
+   70           | expression NE expression •
+   71           | expression • AND expression
+   72           | expression • OR expression
+   73           | expression • ASSIGN expression
+   74           | expression • DOUBLE_ADD
+   75           | expression • DOUBLE_SUB
+
+    DOUBLE_ADD  shift, and go to state 105
+    DOUBLE_SUB  shift, and go to state 106
+    MUL         shift, and go to state 107
+    DIV         shift, and go to state 108
+    MOD         shift, and go to state 109
+    ADD         shift, and go to state 110
+    SUB         shift, and go to state 111
+
+    $default  reduce using rule 70 (expression)
+
+
+State 145
+
+   60 expression: expression • ADD expression
+   61           | expression • SUB expression
+   62           | expression • MUL expression
+   63           | expression • DIV expression
+   64           | expression • MOD expression
+   65           | expression • GT expression
+   66           | expression • GE expression
+   67           | expression • LT expression
+   68           | expression • LE expression
+   69           | expression • EQ expression
+   70           | expression • NE expression
+   71           | expression • AND expression
+   71           | expression AND expression •
+   72           | expression • OR expression
+   73           | expression • ASSIGN expression
+   74           | expression • DOUBLE_ADD
+   75           | expression • DOUBLE_SUB
+
+    DOUBLE_ADD  shift, and go to state 105
+    DOUBLE_SUB  shift, and go to state 106
+    MUL         shift, and go to state 107
+    DIV         shift, and go to state 108
+    MOD         shift, and go to state 109
+    ADD         shift, and go to state 110
+    SUB         shift, and go to state 111
+    LT          shift, and go to state 112
+    LE          shift, and go to state 113
+    GT          shift, and go to state 114
+    GE          shift, and go to state 115
+    EQ          shift, and go to state 116
+    NE          shift, and go to state 117
+    ASSIGN      shift, and go to state 120
+
+    $default  reduce using rule 71 (expression)
+
+
+State 146
+
+   60 expression: expression • ADD expression
+   61           | expression • SUB expression
+   62           | expression • MUL expression
+   63           | expression • DIV expression
+   64           | expression • MOD expression
+   65           | expression • GT expression
+   66           | expression • GE expression
+   67           | expression • LT expression
+   68           | expression • LE expression
+   69           | expression • EQ expression
+   70           | expression • NE expression
+   71           | expression • AND expression
+   72           | expression • OR expression
+   72           | expression OR expression •
+   73           | expression • ASSIGN expression
+   74           | expression • DOUBLE_ADD
+   75           | expression • DOUBLE_SUB
+
+    DOUBLE_ADD  shift, and go to state 105
+    DOUBLE_SUB  shift, and go to state 106
+    MUL         shift, and go to state 107
+    DIV         shift, and go to state 108
+    MOD         shift, and go to state 109
+    ADD         shift, and go to state 110
+    SUB         shift, and go to state 111
+    LT          shift, and go to state 112
+    LE          shift, and go to state 113
+    GT          shift, and go to state 114
+    GE          shift, and go to state 115
+    EQ          shift, and go to state 116
+    NE          shift, and go to state 117
+    AND         shift, and go to state 118
+    ASSIGN      shift, and go to state 120
+
+    $default  reduce using rule 72 (expression)
+
+
+State 147
+
+   60 expression: expression • ADD expression
+   61           | expression • SUB expression
+   62           | expression • MUL expression
+   63           | expression • DIV expression
+   64           | expression • MOD expression
+   65           | expression • GT expression
+   66           | expression • GE expression
+   67           | expression • LT expression
+   68           | expression • LE expression
+   69           | expression • EQ expression
+   70           | expression • NE expression
+   71           | expression • AND expression
+   72           | expression • OR expression
+   73           | expression • ASSIGN expression
+   73           | expression ASSIGN expression •
+   74           | expression • DOUBLE_ADD
+   75           | expression • DOUBLE_SUB
+
+    DOUBLE_ADD  shift, and go to state 105
+    DOUBLE_SUB  shift, and go to state 106
+    MUL         shift, and go to state 107
+    DIV         shift, and go to state 108
+    MOD         shift, and go to state 109
+    ADD         shift, and go to state 110
+    SUB         shift, and go to state 111
+    LT          shift, and go to state 112
+    LE          shift, and go to state 113
+    GT          shift, and go to state 114
+    GE          shift, and go to state 115
+    EQ          shift, and go to state 116
+    NE          shift, and go to state 117
+    ASSIGN      shift, and go to state 120
+
+    $default  reduce using rule 73 (expression)
+
+
+State 148
+
+   48 istmt: FOR L_PARENTHESES expression SEMICOLON • expression SEMICOLON expression R_PARENTHESES estmt_or_cstmt
+
+    L_PARENTHESES   shift, and go to state 55
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    expression    go to state 155
+    literal       go to state 82
+    array_invoke  go to state 83
+    func_invoke   go to state 84
+
+
+State 149
+
+   49 istmt: FOREACH L_PARENTHESES IDENT COLON • num RANGE num R_PARENTHESES estmt_or_cstmt
+
+    INT_LITERAL  shift, and go to state 156
+    IDENT        shift, and go to state 157
+
+    num  go to state 158
+
+
+State 150
+
+   43 sstmt: IF L_PARENTHESES bool_expr R_PARENTHESES • estmt_or_cstmt
+   44      | IF L_PARENTHESES bool_expr R_PARENTHESES • estmt_or_cstmt ELSE estmt_or_cstmt
+
+    SEMICOLON       shift, and go to state 54
+    L_PARENTHESES   shift, and go to state 55
+    L_BRACKETS      shift, and go to state 43
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    PRINT           shift, and go to state 62
+    PRINTLN         shift, and go to state 63
+    READ            shift, and go to state 64
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    cstmt           go to state 159
+    estmt           go to state 160
+    estmt_or_cstmt  go to state 161
+    expression      go to state 81
+    literal         go to state 82
+    array_invoke    go to state 83
+    func_invoke     go to state 84
+
+
+State 151
+
+   47 istmt: WHILE L_PARENTHESES bool_expr R_PARENTHESES • estmt_or_cstmt
+
+    SEMICOLON       shift, and go to state 54
+    L_PARENTHESES   shift, and go to state 55
+    L_BRACKETS      shift, and go to state 43
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    PRINT           shift, and go to state 62
+    PRINTLN         shift, and go to state 63
+    READ            shift, and go to state 64
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    cstmt           go to state 159
+    estmt           go to state 160
+    estmt_or_cstmt  go to state 162
+    expression      go to state 81
+    literal         go to state 82
+    array_invoke    go to state 83
+    func_invoke     go to state 84
+
+
+State 152
+
+   93 arg_expr_list: arg_expr_list COMMA • expression
+
+    L_PARENTHESES   shift, and go to state 55
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    expression    go to state 163
+    literal       go to state 82
+    array_invoke  go to state 83
+    func_invoke   go to state 84
+
+
+State 153
+
+   91 func_invoke: IDENT L_PARENTHESES arg_expr_list R_PARENTHESES •
+
+    $default  reduce using rule 91 (func_invoke)
+
+
+State 154
+
+   89 dim_expr_list: L_SQUARE_BRACKETS expression R_SQUARE_BRACKETS • dim_expr_list
+   90              | L_SQUARE_BRACKETS expression R_SQUARE_BRACKETS •
+
+    L_SQUARE_BRACKETS  shift, and go to state 100
+
+    $default  reduce using rule 90 (dim_expr_list)
+
+    dim_expr_list  go to state 164
+
+
+State 155
+
+   48 istmt: FOR L_PARENTHESES expression SEMICOLON expression • SEMICOLON expression R_PARENTHESES estmt_or_cstmt
+   60 expression: expression • ADD expression
+   61           | expression • SUB expression
+   62           | expression • MUL expression
+   63           | expression • DIV expression
+   64           | expression • MOD expression
+   65           | expression • GT expression
+   66           | expression • GE expression
+   67           | expression • LT expression
+   68           | expression • LE expression
+   69           | expression • EQ expression
+   70           | expression • NE expression
+   71           | expression • AND expression
+   72           | expression • OR expression
+   73           | expression • ASSIGN expression
+   74           | expression • DOUBLE_ADD
+   75           | expression • DOUBLE_SUB
+
+    SEMICOLON   shift, and go to state 165
+    DOUBLE_ADD  shift, and go to state 105
+    DOUBLE_SUB  shift, and go to state 106
+    MUL         shift, and go to state 107
+    DIV         shift, and go to state 108
+    MOD         shift, and go to state 109
+    ADD         shift, and go to state 110
+    SUB         shift, and go to state 111
+    LT          shift, and go to state 112
+    LE          shift, and go to state 113
+    GT          shift, and go to state 114
+    GE          shift, and go to state 115
+    EQ          shift, and go to state 116
+    NE          shift, and go to state 117
+    AND         shift, and go to state 118
+    OR          shift, and go to state 119
+    ASSIGN      shift, and go to state 120
+
+
+State 156
+
+   54 num: INT_LITERAL •
+
+    $default  reduce using rule 54 (num)
+
+
+State 157
+
+   53 num: IDENT •
+
+    $default  reduce using rule 53 (num)
+
+
+State 158
+
+   49 istmt: FOREACH L_PARENTHESES IDENT COLON num • RANGE num R_PARENTHESES estmt_or_cstmt
+
+    RANGE  shift, and go to state 166
+
+
+State 159
+
+   46 estmt_or_cstmt: cstmt •
+
+    $default  reduce using rule 46 (estmt_or_cstmt)
+
+
+State 160
+
+   45 estmt_or_cstmt: estmt •
+
+    $default  reduce using rule 45 (estmt_or_cstmt)
+
+
+State 161
+
+   43 sstmt: IF L_PARENTHESES bool_expr R_PARENTHESES estmt_or_cstmt •
+   44      | IF L_PARENTHESES bool_expr R_PARENTHESES estmt_or_cstmt • ELSE estmt_or_cstmt
+
+    ELSE  shift, and go to state 167
+
+    $default  reduce using rule 43 (sstmt)
+
+
+State 162
+
+   47 istmt: WHILE L_PARENTHESES bool_expr R_PARENTHESES estmt_or_cstmt •
+
+    $default  reduce using rule 47 (istmt)
+
+
+State 163
+
+   60 expression: expression • ADD expression
+   61           | expression • SUB expression
+   62           | expression • MUL expression
+   63           | expression • DIV expression
+   64           | expression • MOD expression
+   65           | expression • GT expression
+   66           | expression • GE expression
+   67           | expression • LT expression
+   68           | expression • LE expression
+   69           | expression • EQ expression
+   70           | expression • NE expression
+   71           | expression • AND expression
+   72           | expression • OR expression
+   73           | expression • ASSIGN expression
+   74           | expression • DOUBLE_ADD
+   75           | expression • DOUBLE_SUB
+   93 arg_expr_list: arg_expr_list COMMA expression •
+
+    DOUBLE_ADD  shift, and go to state 105
+    DOUBLE_SUB  shift, and go to state 106
+    MUL         shift, and go to state 107
+    DIV         shift, and go to state 108
+    MOD         shift, and go to state 109
+    ADD         shift, and go to state 110
+    SUB         shift, and go to state 111
+    LT          shift, and go to state 112
+    LE          shift, and go to state 113
+    GT          shift, and go to state 114
+    GE          shift, and go to state 115
+    EQ          shift, and go to state 116
+    NE          shift, and go to state 117
+    AND         shift, and go to state 118
+    OR          shift, and go to state 119
+    ASSIGN      shift, and go to state 120
+
+    $default  reduce using rule 93 (arg_expr_list)
+
+
+State 164
+
+   89 dim_expr_list: L_SQUARE_BRACKETS expression R_SQUARE_BRACKETS dim_expr_list •
+
+    $default  reduce using rule 89 (dim_expr_list)
+
+
+State 165
+
+   48 istmt: FOR L_PARENTHESES expression SEMICOLON expression SEMICOLON • expression R_PARENTHESES estmt_or_cstmt
+
+    L_PARENTHESES   shift, and go to state 55
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    expression    go to state 168
+    literal       go to state 82
+    array_invoke  go to state 83
+    func_invoke   go to state 84
+
+
+State 166
+
+   49 istmt: FOREACH L_PARENTHESES IDENT COLON num RANGE • num R_PARENTHESES estmt_or_cstmt
+
+    INT_LITERAL  shift, and go to state 156
+    IDENT        shift, and go to state 157
+
+    num  go to state 169
+
+
+State 167
+
+   44 sstmt: IF L_PARENTHESES bool_expr R_PARENTHESES estmt_or_cstmt ELSE • estmt_or_cstmt
+
+    SEMICOLON       shift, and go to state 54
+    L_PARENTHESES   shift, and go to state 55
+    L_BRACKETS      shift, and go to state 43
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    PRINT           shift, and go to state 62
+    PRINTLN         shift, and go to state 63
+    READ            shift, and go to state 64
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    cstmt           go to state 159
+    estmt           go to state 160
+    estmt_or_cstmt  go to state 170
+    expression      go to state 81
+    literal         go to state 82
+    array_invoke    go to state 83
+    func_invoke     go to state 84
+
+
+State 168
+
+   48 istmt: FOR L_PARENTHESES expression SEMICOLON expression SEMICOLON expression • R_PARENTHESES estmt_or_cstmt
+   60 expression: expression • ADD expression
+   61           | expression • SUB expression
+   62           | expression • MUL expression
+   63           | expression • DIV expression
+   64           | expression • MOD expression
+   65           | expression • GT expression
+   66           | expression • GE expression
+   67           | expression • LT expression
+   68           | expression • LE expression
+   69           | expression • EQ expression
+   70           | expression • NE expression
+   71           | expression • AND expression
+   72           | expression • OR expression
+   73           | expression • ASSIGN expression
+   74           | expression • DOUBLE_ADD
+   75           | expression • DOUBLE_SUB
+
+    R_PARENTHESES  shift, and go to state 171
+    DOUBLE_ADD     shift, and go to state 105
+    DOUBLE_SUB     shift, and go to state 106
+    MUL            shift, and go to state 107
+    DIV            shift, and go to state 108
+    MOD            shift, and go to state 109
+    ADD            shift, and go to state 110
+    SUB            shift, and go to state 111
+    LT             shift, and go to state 112
+    LE             shift, and go to state 113
+    GT             shift, and go to state 114
+    GE             shift, and go to state 115
+    EQ             shift, and go to state 116
+    NE             shift, and go to state 117
+    AND            shift, and go to state 118
+    OR             shift, and go to state 119
+    ASSIGN         shift, and go to state 120
+
+
+State 169
+
+   49 istmt: FOREACH L_PARENTHESES IDENT COLON num RANGE num • R_PARENTHESES estmt_or_cstmt
+
+    R_PARENTHESES  shift, and go to state 172
+
+
+State 170
+
+   44 sstmt: IF L_PARENTHESES bool_expr R_PARENTHESES estmt_or_cstmt ELSE estmt_or_cstmt •
+
+    $default  reduce using rule 44 (sstmt)
+
+
+State 171
+
+   48 istmt: FOR L_PARENTHESES expression SEMICOLON expression SEMICOLON expression R_PARENTHESES • estmt_or_cstmt
+
+    SEMICOLON       shift, and go to state 54
+    L_PARENTHESES   shift, and go to state 55
+    L_BRACKETS      shift, and go to state 43
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    PRINT           shift, and go to state 62
+    PRINTLN         shift, and go to state 63
+    READ            shift, and go to state 64
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    cstmt           go to state 159
+    estmt           go to state 160
+    estmt_or_cstmt  go to state 173
+    expression      go to state 81
+    literal         go to state 82
+    array_invoke    go to state 83
+    func_invoke     go to state 84
+
+
+State 172
+
+   49 istmt: FOREACH L_PARENTHESES IDENT COLON num RANGE num R_PARENTHESES • estmt_or_cstmt
+
+    SEMICOLON       shift, and go to state 54
+    L_PARENTHESES   shift, and go to state 55
+    L_BRACKETS      shift, and go to state 43
+    SUB             shift, and go to state 57
+    FALSE           shift, and go to state 58
+    PRINT           shift, and go to state 62
+    PRINTLN         shift, and go to state 63
+    READ            shift, and go to state 64
+    TRUE            shift, and go to state 66
+    INT_LITERAL     shift, and go to state 68
+    FLOAT_LITERAL   shift, and go to state 69
+    STRING_LITERAL  shift, and go to state 70
+    IDENT           shift, and go to state 71
+    NOT             shift, and go to state 72
+
+    cstmt           go to state 159
+    estmt           go to state 160
+    estmt_or_cstmt  go to state 174
+    expression      go to state 81
+    literal         go to state 82
+    array_invoke    go to state 83
+    func_invoke     go to state 84
+
+
+State 173
+
+   48 istmt: FOR L_PARENTHESES expression SEMICOLON expression SEMICOLON expression R_PARENTHESES estmt_or_cstmt •
+
+    $default  reduce using rule 48 (istmt)
+
+
+State 174
+
+   49 istmt: FOREACH L_PARENTHESES IDENT COLON num RANGE num R_PARENTHESES estmt_or_cstmt •
+
+    $default  reduce using rule 49 (istmt)

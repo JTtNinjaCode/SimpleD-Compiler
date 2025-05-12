@@ -1,0 +1,8 @@
+void main()
+{
+  int a [1][3];
+  int b;
+  b = a[4][2][5];
+  println "Hello World";
+}
+
