@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 #include "sym_table.h"
 #include "stat_and_trace.h"
 
@@ -22,6 +23,8 @@ typedef struct IdentDecl {
     float   fval;       // for floating point literals
     char   *sval;       // for string literals
     char   *idname;     // for identifier name
+    int     type_id;
+    
 }
 
 %token DOT
@@ -38,7 +41,7 @@ typedef struct IdentDecl {
 
 /* Todo: Implement C Operator Precedence */
 %token DADD DSUB MUL DIV MOD ADD SUB
-%token LT LE GT GE EQ NE AND OR
+%token LT LE GT GE EQ NE AND OR NOT
 %token TERNARY ASSIGN
 
 /* Keywords */
@@ -94,25 +97,71 @@ external_decl
 func_def
     : type IDENT {
             TRACE("func_def", "begin");
-            TRACE("func_def", "ret type: %s", "Hello");
             TRACE("func_def", "func ident: %s", $2);
             global_stat_ctx.num_param = 0;
+
+            memset(&global_stat_ctx.sym,0 ,sizeof(Symbol));
+            global_stat_ctx.sym.base_type = global_stat_ctx.type;
+            global_stat_ctx.sym.is_func = true;
+            strcpy(global_stat_ctx.sym.name, $2);
+
+            add_symtab_layer();
         } L_PARENTHESES param_list_or_empty R_PARENTHESES {
-            TRACE("func_def", "nums of param: %d", global_stat_ctx.num_param);
+            global_stat_ctx.sym.param_num = global_stat_ctx.num_param;
+            if (insert_parent(&global_stat_ctx.sym) == SYMTAB_ERR_DUP) {
+                ERR("symbol tabel name conflict.");
+            }
+
             global_stat_ctx.num_param = 0;
             global_stat_ctx.indent++;
-        } cstmt {
+        } fcstmt {
+            print_symtab_ctx();
+            delete_symtab_layer();
             global_stat_ctx.indent--;
             TRACE("func_def", "end");
-        }       
+        }
+
+/* special case */
+fcstmt
+    : L_BRACKETS {
+            TRACE("fcstmt", "begin");
+            global_stat_ctx.indent++;
+        } stmts R_BRACKETS {
+            global_stat_ctx.indent--;
+            TRACE("fcstmt", "end");
+        }
 
 param_list_or_empty
     : param_list
     | /* epsilon */
 
 param_list
-    : type IDENT COMMA param_list                                   { global_stat_ctx.num_param++; TRACE("func_def", "param ident: %s ", $2);     }
-    | type IDENT                                                    { global_stat_ctx.num_param++; TRACE("func_def", "param ident: %s ", $2);     }
+    : param_list COMMA type IDENT {
+            global_stat_ctx.sym.func_param_type[global_stat_ctx.num_param] = global_stat_ctx.type;
+
+            Symbol sym = {};
+            sym.base_type = global_stat_ctx.type;
+            strcpy(sym.name, $4);
+            if (insert(&sym) == SYMTAB_ERR_DUP) {
+                ERR("symbol tabel name conflict.");
+            }
+
+            global_stat_ctx.num_param++;
+            TRACE("func_def", "param ident: %s", $4);
+        }
+    | type IDENT {
+            global_stat_ctx.sym.func_param_type[global_stat_ctx.num_param] = global_stat_ctx.type;
+
+            Symbol sym = {};
+            sym.base_type = global_stat_ctx.type;
+            strcpy(sym.name, $2);
+            if (insert(&sym) == SYMTAB_ERR_DUP) {
+                ERR("symbol tabel name conflict.");
+            }
+
+            global_stat_ctx.num_param++;
+            TRACE("func_def", "param ident: %s", $2);
+        }
 
 stmts
     : stmts stmt                            { }
@@ -135,50 +184,86 @@ const_decl
     : CONST type {
             TRACE("const_decl", "begin");
             global_stat_ctx.indent++;
+            global_stat_ctx.is_const = true;
         } ident_decl_list SEMICOLON  {
+            global_stat_ctx.is_const = false;
             global_stat_ctx.indent--;
             TRACE("const_decl", "end");
         }
 
 type
-    : VOID
-    | BOOL
-    | INT
-    | STRING
-    | FLOAT
-    | DOUBLE
+    : VOID                                  { global_stat_ctx.type = VOID;      }
+    | BOOL                                  { global_stat_ctx.type = BOOL;      }
+    | INT                                   { global_stat_ctx.type = INT;       }
+    | STRING                                { global_stat_ctx.type = STRING;    }
+    | FLOAT                                 { global_stat_ctx.type = FLOAT;     }
+    | DOUBLE                                { global_stat_ctx.type = DOUBLE;    }
 
 var_decl
     : type ident_decl_list SEMICOLON {
-            TRACE0("var_decl");
-        }
+        TRACE("var_decl", "end");
+    }
 
 ident_decl_list
     : ident_decl COMMA ident_decl_list
     | ident_decl
 
 ident_decl
-    : IDENT ASSIGN constexpr
-    | IDENT
+    : IDENT decl_init_or_none {
+
+            Symbol sym = {};
+            sym.base_type = global_stat_ctx.type;
+            sym.is_const = global_stat_ctx.is_const;
+            strcpy(sym.name, $1);
+            if (insert(&sym) == SYMTAB_ERR_DUP) {
+                ERR("symbol tabel name conflict.");
+            }
+
+            TRACE("var_decl", "ident: %s", $1);
+        }
+
+decl_init_or_none                          
+    : ASSIGN constexpr                      { TRACE("var_decl", "have initilizer");         }
+    | /* epsilon */                         { TRACE("var_decl", "not have initializer");    }    
 
 ary_decl
-    : type IDENT bracket_list SEMICOLON {
-            TRACE0("ary_decl");
+    : type IDENT {
+
+            memset(&global_stat_ctx.sym,0 ,sizeof(Symbol));
+            global_stat_ctx.sym.base_type = global_stat_ctx.type;
+            global_stat_ctx.sym.is_array = true;
+            strcpy(global_stat_ctx.sym.name, $2);
+            global_stat_ctx.sym.ary_dim_num = 0;
+
+        } bracket_list SEMICOLON {
+            if (insert(&global_stat_ctx.sym) == SYMTAB_ERR_DUP) {
+                ERR("symbol tabel name conflict.");
+            }
+            TRACE("ary_decl", "ident: %s", $2);
         }
 
 bracket_list
-    : L_SQUARE_BRACKETS INT_LITERAL R_SQUARE_BRACKETS bracket_list
-    | L_SQUARE_BRACKETS INT_LITERAL R_SQUARE_BRACKETS
+    : L_SQUARE_BRACKETS INT_LITERAL R_SQUARE_BRACKETS bracket_list {
+            global_stat_ctx.sym.ary_dim[global_stat_ctx.sym.ary_dim_num] = $2;
+            global_stat_ctx.sym.ary_dim_num++;
+        }
+    | L_SQUARE_BRACKETS INT_LITERAL R_SQUARE_BRACKETS {
+            global_stat_ctx.sym.ary_dim[global_stat_ctx.sym.ary_dim_num] = $2;
+            global_stat_ctx.sym.ary_dim_num++;
+        }
 
 cstmt
     : L_BRACKETS {
-        TRACE("cstmt", "begin");
-        global_stat_ctx.indent++;
-    } stmts R_BRACKETS {
-        global_stat_ctx.indent--;
-        TRACE("cstmt", "numbers of stmt: %d", local_stat_ctx.num_substat);
-        TRACE("cstmt", "end");
-    }
+            TRACE("cstmt", "begin");
+            global_stat_ctx.indent++;
+            add_symtab_layer();
+        } stmts {
+            print_symtab_ctx();
+            delete_symtab_layer();
+        } R_BRACKETS {
+            global_stat_ctx.indent--;
+            TRACE("cstmt", "end");
+        }
 
 /* no just expression statement, also contain some speicial statement, like print, bruh */
 estmt
@@ -215,17 +300,29 @@ expr_preamble
     :   /* */
 
 sstmt
-    : IF L_PARENTHESES bool_expr R_PARENTHESES estmt_or_cstmt                                       { }
-    | IF L_PARENTHESES bool_expr R_PARENTHESES estmt_or_cstmt ELSE estmt_or_cstmt                   { }
+    : IF {
+            TRACE0("if");
+        } L_PARENTHESES bool_expr R_PARENTHESES estmt_or_cstmt else_part
+
+else_part
+    : ELSE {
+        } estmt_or_cstmt {
+        }
+    | /* epsilon */
 
 estmt_or_cstmt
     : estmt
     | cstmt
-
 istmt
-    : WHILE L_PARENTHESES bool_expr R_PARENTHESES estmt_or_cstmt                                                 { }
-    | FOR L_PARENTHESES expression SEMICOLON expression SEMICOLON expression R_PARENTHESES estmt_or_cstmt        { }
-    | FOREACH L_PARENTHESES IDENT COLON num RANGE num R_PARENTHESES estmt_or_cstmt                               { }
+    : WHILE {
+            TRACE0("while");
+        } L_PARENTHESES bool_expr R_PARENTHESES estmt_or_cstmt
+    | FOR {
+            TRACE0("for");
+        } L_PARENTHESES expression SEMICOLON expression SEMICOLON expression R_PARENTHESES estmt_or_cstmt
+    | FOREACH {
+            TRACE0("foreach");
+        } L_PARENTHESES IDENT COLON num RANGE num R_PARENTHESES estmt_or_cstmt
 
 jstmt
     : RETURN {
@@ -249,11 +346,7 @@ num
     | INT_LITERAL
 
 constexpr
-    : INT_LITERAL
-    | FLOAT_LITERAL
-    | STRING_LITERAL
-    | TRUE
-    | FALSE
+    : expression
 
 /* One Confliction Below */
 expression
@@ -270,33 +363,48 @@ expression
     | expression NE     expression                          { TRACE0("NE");                 }
     | expression AND    expression                          { TRACE0("AND");                 }
     | expression OR     expression                          { TRACE0("OR");                 }
-    | expression ASSIGN expression                          { TRACE0("ASSIGN");                 }
-    | expression DADD                                       { TRACE0("DADD");         }
-    | expression DSUB                                       { TRACE0("DSUB");         }    
-    | NOT expression                                        { TRACE0("NOT");          }
-    | SUB expression %prec USUB                             { TRACE0("SUB(Unary)");   }
-    | L_PARENTHESES expression R_PARENTHESES                { TRACE0("PARENTHESE");   }
-    | IDENT                                                 { TRACE0("IDNET");          }
-    | literal                                               { TRACE0("literal");;         }
-    | ary_invoke                                            { TRACE0("ary_invoke");          }
-    | func_invoke                                           { TRACE0("func_invoke");          }
+    | expression ASSIGN expression                          { TRACE0("ASSIGN");                     }
+    | expression DADD                                       { TRACE0("DADD");                       }
+    | expression DSUB                                       { TRACE0("DSUB");                       }    
+    | NOT expression                                        { TRACE0("NOT");                        }
+    | SUB expression %prec USUB                             { TRACE0("SUB(Unary)");                 }
+    | L_PARENTHESES expression R_PARENTHESES                { TRACE0("PARENTHESE");                 }
+    | IDENT {
+            if (!search($1)) {
+                ERR("Identifier not exists.");
+            }
+            TRACE("IDNET", "ident:%s", $1);
+        }
+    | literal                                               { }
+    | ary_invoke                                            { }
+    | func_invoke                                           { }
 
 literal
-    : INT_LITERAL
-    | FLOAT_LITERAL
-    | STRING_LITERAL
-    | TRUE
-    | FALSE
+    : INT_LITERAL                                           { TRACE("literal", "int literal: %d", $1);          }
+    | FLOAT_LITERAL                                         { TRACE("literal", "float literal: %f", $1);        }
+    | STRING_LITERAL                                        { TRACE("literal", "string literal: %s", $1);       }
+    | TRUE                                                  { TRACE("literal", "bool literal: true");           }
+    | FALSE                                                 { TRACE("literal", "bool literal: false");          }
 
 ary_invoke
-    : IDENT dim_expr_list
+    : IDENT dim_expr_list {
+        if (!search($1)) {
+            ERR("Identifier not exists.");
+        }
+        TRACE("ary_invoke", "ident: %s", $1);
+    }
 
 dim_expr_list
     : L_SQUARE_BRACKETS expression R_SQUARE_BRACKETS dim_expr_list
     | L_SQUARE_BRACKETS expression R_SQUARE_BRACKETS
 
 func_invoke
-    : IDENT L_PARENTHESES arg_expr_list R_PARENTHESES
+    : IDENT L_PARENTHESES arg_expr_list R_PARENTHESES {
+            if (!search($1)) {
+                ERR("Identifier not exists.");
+            }
+            TRACE("func_invoke", "ident: %s", $1);
+        }
 
 arg_expr_list
     : expression
@@ -307,22 +415,30 @@ void yyerror(char *msg) {
     printf("ERROR: %s\n", msg);
 }
 
-void traverse_ast_tree() {
+void check_main_function() {
+    Symbol *sym = search("main");
+    if (sym) {
+        if (sym->base_type != VOID) {
+            ERR("main func's return type should be void\n");
+        }
+        if (sym->param_num != 0) {
+            ERR("main func shouldnt have param.\n");
+        }
+    } else {
+        ERR("main func not exists.\n");
+    }
 
 }
-
-void init_sym_table() {
-
-}
-void check_main_function() {}
 
 int main() {
-    init_sym_table;
-
+    init_symtab_ctx();
     printf("Start to parsing program:\n");
     yyparse();
 
+    printf("\n");
+    print_symtab_ctx();
+
     check_main_function();
-    traverse_ast_tree();
+
     return 0;
 }

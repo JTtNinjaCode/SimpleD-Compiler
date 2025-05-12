@@ -2,6 +2,11 @@
     "files.associations": {
         "compare": "cpp",
         "type_traits": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "sym_table.h": "c",
+        "typeinfo": "c",
+        "stdio.h": "c",
+        "cstdlib": "c",
+        "stdlib.h": "c"
     }
 }

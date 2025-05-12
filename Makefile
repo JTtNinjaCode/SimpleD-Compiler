@@ -12,7 +12,7 @@ YACC_SRC = $(SRC_DIR)/parser.y
 
 TARGET  = parser
 
-# List all your C source files and header here
+# Source and header file
 CFILES = $(SRC_DIR)/sym_table.c
 HFILES = $(SRC_DIR)/sym_table.h
 
@@ -26,16 +26,14 @@ OBJS = $(CFILES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
 LEX_O = $(BUILD_DIR)/lex.yy.o
 YACC_O = $(BUILD_DIR)/y.tab.o
 
-# Get all .sd file in example_code directoryEXAMPLES
+# Get all .sd file in EXAMPLES directory
 EXAMPLES = $(wildcard $(EXAMPLE_DIR)/*.sd)
 
 all: $(TARGET)
 
-# Ensure the build directory exists
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
-# Link the object files into the final executable
 $(TARGET): $(OBJS) $(LEX_O) $(YACC_O)
 	$(CC) -o $(BUILD_DIR)/$@ $^ -ll
 
@@ -48,16 +46,16 @@ $(YACC_C) $(YACC_H): $(YACC_SRC) $(BUILD_DIR)
 	$(YACC) -Wconflicts-sr -Wconflicts-rr -v -d -o $(YACC_C) $<
 
 # Compile all C source files into object files in the build directory
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c $(HFILES) $(BUILD_DIR)
-	$(CC) -o $@ -c $< -I$(SRC_DIR)
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c $(HFILES) $(BUILD_DIR) $(YACC_H)
+	$(CC) -o $@ -c $< -I$(SRC_DIR) -I$(BUILD_DIR)
 
 # Compile lex.yy.o from lex.yy.c
 $(BUILD_DIR)/lex.yy.o: $(LEX_C) $(YACC_H)
-	$(CC) -o $@ -c $(LEX_C) -I$(SRC_DIR)
+	$(CC) -o $@ -c $(LEX_C) -I$(SRC_DIR) -I$(BUILD_DIR)
 
 # Compile y.tab.o from y.tab.c
 $(BUILD_DIR)/y.tab.o: $(YACC_C)
-	$(CC) -o $@ -c $(YACC_C) -I$(SRC_DIR)
+	$(CC) -o $@ -c $(YACC_C) -I$(SRC_DIR) -I$(BUILD_DIR)
 
 # Check for conflicts in the yacc output
 conflict_check: $(BUILD_DIR)/y.output

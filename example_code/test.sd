@@ -1,19 +1,9 @@
-float ary[100];
-
-const int asd;
-int abb;
-int a, b, c, d;
-int add (int a, int b)
-{
-  ;
-  ;
-  return a+b;
-  return ;
+float add(float a, int b) {
+  string ary[100][200][500];
+  int a;
+  return a + b;
 }
 
-void main()
-{
-  int a0, a1, a2, a3, a5 = 5;
-  a0 + a1 * (a2 * a3) / a7 * -a1 > 5;
+void main () {
+  print "Hello World";
 }
-
