@@ -1,0 +1,22 @@
+void foo0() {}
+void foo1(int a) {}
+bool foo2(int a, int b) {}
+
+void main()
+{
+  int       i;
+  float     f;
+  string    str;
+  bool      b;
+
+  const int       ci = 1;
+  const float     cf = 1.0;
+  const string    cstr = "Hello";
+  const bool      cb1 = true;
+  const bool      cb2 = false;
+
+  int       ai[1];
+  float     af[1][1];
+  string    astr[1][1];
+  bool      ab[1][1];
+}

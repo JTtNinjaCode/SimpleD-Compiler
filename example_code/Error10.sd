@@ -1,0 +1,4 @@
+/* lhs of assign operator should be and object */
+void main() {
+  5 = 123;
+}

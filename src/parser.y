@@ -40,7 +40,7 @@ int check_binary_type(int left, int right, char *op) {
         ERR("type mismatch in operation '%s'", op);
         return -1;
     }
-    return left;  // return the common type if same
+    return left;
 }
 
 int yacctype_to_ettype(int yacctype);
@@ -52,10 +52,20 @@ int yacctype_to_ettype(int yacctype);
     float            fval;       // for floating point literals
     char            *sval;       // for string literals
     char            *idname;     // for identifier name
-    int              type;
+
+    struct ParseInfo {
+        int             type;
+        int             is_object;
+        int             is_array;
+        int             is_func;
+        int             is_const;
+        int             func_param_type[16];
+        int             ary_dim[16];
+    } parse_info;
+
 }
 
-%type <type> expression literal ary_invoke func_invoke jmp_expr_or_none
+%type <parse_info> expression ident literal ary_invoke func_invoke jmp_expr_or_none
 
 %token DOT
 %token RANGE
@@ -358,8 +368,8 @@ jstmt
         }
 
 jmp_expr_or_none
-    : expression            { $$ = $1;      }
-    | /* epsilon */         { $$ = ET_VOID; }
+    : expression            { $$ = $1;              }
+    | /* epsilon */         { $$.type = ET_VOID;    }
 
 bool_expr
     : expression
@@ -373,47 +383,58 @@ constexpr
 
 /* One Confliction Below */
 expression
-    : expression ADD    expression                          { TRACE0("ADD");           $$ = check_binary_type($1, $3, "+");      }
-    | expression SUB    expression                          { TRACE0("SUB");           $$ = check_binary_type($1, $3, "-");      }
-    | expression MUL    expression                          { TRACE0("MUL");           $$ = check_binary_type($1, $3, "*");      }
-    | expression DIV    expression                          { TRACE0("DIV");           $$ = check_binary_type($1, $3, "/");      }
-    | expression MOD    expression                          { TRACE0("MOD");           $$ = check_binary_type($1, $3, "%");      }
+    : expression ADD    expression                          { TRACE0("ADD");         $$ = $1; $$.type = check_binary_type($1.type, $3.type, "+");      }
+    | expression SUB    expression                          { TRACE0("SUB");         $$ = $1; $$.type = check_binary_type($1.type, $3.type, "-");      }
+    | expression MUL    expression                          { TRACE0("MUL");         $$ = $1; $$.type = check_binary_type($1.type, $3.type, "*");      }
+    | expression DIV    expression                          { TRACE0("DIV");         $$ = $1; $$.type = check_binary_type($1.type, $3.type, "/");      }
+    | expression MOD    expression                          { TRACE0("MOD");         $$ = $1; $$.type = check_binary_type($1.type, $3.type, "%");      }
     /* Comparisons → Always return ET_BOOL */
-    | expression GT     expression                          { TRACE0("GT ");    check_binary_type($1, $3, ">");  $$ = ET_BOOL; }
-    | expression GE     expression                          { TRACE0("GE ");    check_binary_type($1, $3, ">="); $$ = ET_BOOL; }
-    | expression LT     expression                          { TRACE0("LT ");    check_binary_type($1, $3, "<");  $$ = ET_BOOL; }
-    | expression LE     expression                          { TRACE0("LE ");    check_binary_type($1, $3, "<="); $$ = ET_BOOL; }
-    | expression EQ     expression                          { TRACE0("EQ ");    check_binary_type($1, $3, "=="); $$ = ET_BOOL; }
-    | expression NE     expression                          { TRACE0("NE");     check_binary_type($1, $3, "!="); $$ = ET_BOOL; }
+    | expression GT     expression                          { TRACE0("GT ");         $$ = $1; check_binary_type($1.type, $3.type, ">");  $$.type = ET_BOOL; }
+    | expression GE     expression                          { TRACE0("GE ");         $$ = $1; check_binary_type($1.type, $3.type, ">="); $$.type = ET_BOOL; }
+    | expression LT     expression                          { TRACE0("LT ");         $$ = $1; check_binary_type($1.type, $3.type, "<");  $$.type = ET_BOOL; }
+    | expression LE     expression                          { TRACE0("LE ");         $$ = $1; check_binary_type($1.type, $3.type, "<="); $$.type = ET_BOOL; }
+    | expression EQ     expression                          { TRACE0("EQ ");         $$ = $1; check_binary_type($1.type, $3.type, "=="); $$.type = ET_BOOL; }
+    | expression NE     expression                          { TRACE0("NE");          $$ = $1; check_binary_type($1.type, $3.type, "!="); $$.type = ET_BOOL; }
 
-    | expression AND    expression                          { TRACE0("AND");           check_binary_type($1, $3, "&&");     $$ = ET_BOOL;   }
-    | expression OR     expression                          { TRACE0("OR");            check_binary_type($1, $3, "||");     $$ = ET_BOOL;   }
+    | expression AND    expression                          { TRACE0("AND");         $$ = $1; check_binary_type($1.type, $3.type, "&&");     $$.type = ET_BOOL;   }
+    | expression OR     expression                          { TRACE0("OR");          $$ = $1; check_binary_type($1.type, $3.type, "||");     $$.type = ET_BOOL;   }
 
-    | expression ASSIGN expression                          { TRACE0("ASSIGN");         $$ = check_binary_type($1, $3, "=");                }
+    | expression ASSIGN expression                          { TRACE0("ASSIGN");      $$ = $1; $$.type = check_binary_type($1.type, $3.type, "=");
+                                                              if (!$1.is_object)    { ERR("lhs of assign operator should be and object"); }
+                                                              if ($1.is_const)      { ERR("assign to const object"); }
+                                                            }
 
-    | expression DADD                                       { TRACE0("DADD");           $$ = $1;        }
-    | expression DSUB                                       { TRACE0("DSUB");           $$ = $1;        }    
-    | NOT expression                                        { TRACE0("NOT");            $$ = ET_BOOL;   }
-    | SUB expression %prec USUB                             { TRACE0("SUB(Unary)");     $$ = $2;        }
-    | L_PARENTHESES expression R_PARENTHESES                { TRACE0("PARENTHESE");     $$ = $2;        }
-    | IDENT {
-            Symbol *sym = search($1);
-            if (!sym) {
-                ERR("identifier not exists.");
-            }
-            TRACE("IDNET", "ident:%s", $1);
-            $$ = sym->base_type;
-        }
-    | literal                                               { $$ = $1; }
+    | expression DADD                                       { TRACE0("DADD");        $$ = $1; $$.type = $1.type;          }
+    | expression DSUB                                       { TRACE0("DSUB");        $$ = $1; $$.type = $1.type;          }    
+    | NOT expression                                        { TRACE0("NOT");         $$ = $2; $$.type = ET_BOOL;          }
+    | SUB expression %prec USUB                             { TRACE0("SUB(Unary)");  $$ = $2; $$.type = $2.type;          }
+    | L_PARENTHESES expression R_PARENTHESES                { TRACE0("PARENTHESE");  $$ = $2; $$.type = $2.type;          }
+    | ident                                                 { $$ = $1;  }
+    | literal                                               { $$ = $1;  }
     | ary_invoke                                            { $$ = $1;  }
     | func_invoke                                           { $$ = $1;  }
 
+ident
+    : IDENT {
+        Symbol *sym = search($1);
+        if (!sym) {
+            ERR("identifier not exists.");
+        }
+
+        $$.type         = sym->base_type;
+        $$.is_object    = true;
+        $$.is_array     = sym->is_array;
+        $$.is_func      = sym->is_func;
+        $$.is_const     = sym->is_const;
+        TRACE("IDNET", "ident:%s", $1);
+    }
+
 literal
-    : INT_LITERAL                                           { TRACE("literal", "int literal: %d", $1);      $$ = ET_INT;        }
-    | FLOAT_LITERAL                                         { TRACE("literal", "float literal: %f", $1);    $$ = ET_FLOAT;      }
-    | STRING_LITERAL                                        { TRACE("literal", "string literal: %s", $1);   $$ = ET_STRING;     }
-    | TRUE                                                  { TRACE("literal", "bool literal: true");       $$ = ET_BOOL;       }
-    | FALSE                                                 { TRACE("literal", "bool literal: false");      $$ = ET_BOOL;       }
+    : INT_LITERAL               { TRACE("literal", "int literal: %d", $1);      memset(&$$, 0, sizeof(struct ParseInfo)); $$.type = ET_INT;        }
+    | FLOAT_LITERAL             { TRACE("literal", "float literal: %f", $1);    memset(&$$, 0, sizeof(struct ParseInfo)); $$.type = ET_FLOAT;      }
+    | STRING_LITERAL            { TRACE("literal", "string literal: %s", $1);   memset(&$$, 0, sizeof(struct ParseInfo)); $$.type = ET_STRING;     }
+    | TRUE                      { TRACE("literal", "bool literal: true");       memset(&$$, 0, sizeof(struct ParseInfo)); $$.type = ET_BOOL;       }
+    | FALSE                     { TRACE("literal", "bool literal: false");      memset(&$$, 0, sizeof(struct ParseInfo)); $$.type = ET_BOOL;       }
 
 ary_invoke
     : IDENT dim_expr_list {
@@ -433,8 +454,13 @@ func_invoke
             if (!sym) {
                 ERR("identifier not exists.");
             }
+
+            $$.type         = sym->base_type;
+            $$.is_object    = true;
+            $$.is_array     = sym->is_array;
+            $$.is_func      = sym->is_func;
+            $$.is_const     = sym->is_const;
             TRACE("func_invoke", "ident: %s", $1);
-            $$ = sym->base_type;
         }
 
 arg_expr_list
@@ -468,7 +494,6 @@ void check_main_function() {
     } else {
         ERR("main func not exists.\n");
     }
-
 }
 
 int main() {

@@ -27,14 +27,16 @@ build and run.
 All output files of example_code are located in the example_output directory. Intermediate compilation results and the program itself are placed in the build directory.
 
 ### Error Message
-- (Error1.sd) type mismatch in operation.
-- (Error2.sd) identifier conflict.
-- (Error3.sd) variable type cant be void.
-- (Error4.sd) array base type cant be void.
-- (Error5.sd) identifier not exists.
-- (Error6.sd) main func's return type should be void.
-- (Error7.sd) main func shouldnt have param.
-- (Error8.sd) main func not exists.
+- (Error1.sd)	type mismatch in operation.
+- (Error2.sd)	identifier conflict.
+- (Error3.sd)	variable type cant be void.
+- (Error4.sd)	array base type cant be void.
+- (Error5.sd)	identifier not exists.
+- (Error6.sd)	main func's return type should be void.
+- (Error7.sd)	main func shouldnt have param.
+- (Error8.sd)	main func not exists.
+- (Error9.sd)	lhs of assign operator should be and object.
+- (Error10.sd) 	assign to const object.
 
 ### Output format
 Example1_sigma.sd.output
