@@ -1,8 +1,10 @@
-float add(float a, int b) {
+float add(int a, int b) {
   string ary[100][200][500];
-  int a;
   return a + b;
 }
+
+int test() {}
+int test() {}
 
 void main () {
   print "Hello World";

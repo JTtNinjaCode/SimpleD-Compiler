@@ -1,0 +1,4 @@
+/* variable type cant be void */
+void main() {
+    void a;
+}

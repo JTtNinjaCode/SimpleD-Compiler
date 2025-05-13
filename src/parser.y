@@ -37,7 +37,7 @@ extern char* yytext;
 
 int check_binary_type(int left, int right, char *op) {
     if (left != right) {
-        ERR("Type mismatch in operation '%s'", op);
+        ERR("type mismatch in operation '%s'", op);
         return -1;
     }
     return left;  // return the common type if same
@@ -123,7 +123,7 @@ func_def
         } L_PARENTHESES param_list_or_empty R_PARENTHESES {
             global_stat_ctx.sym.param_num = global_stat_ctx.num_param;
             if (insert_parent(&global_stat_ctx.sym) == SYMTAB_ERR_DUP) {
-                ERR("symbol tabel name conflict.");
+                ERR("identifier conflict: %s", $2);
             }
 
             global_stat_ctx.num_param = 0;
@@ -157,7 +157,7 @@ param_list
             sym.base_type = global_stat_ctx.type;
             strcpy(sym.name, $4);
             if (insert(&sym) == SYMTAB_ERR_DUP) {
-                ERR("symbol tabel name conflict.");
+                ERR("identifier conflict: %s", $4);
             }
 
             global_stat_ctx.num_param++;
@@ -170,7 +170,7 @@ param_list
             sym.base_type = global_stat_ctx.type;
             strcpy(sym.name, $2);
             if (insert(&sym) == SYMTAB_ERR_DUP) {
-                ERR("symbol tabel name conflict.");
+                ERR("identifier conflict: %s", $2);
             }
 
             global_stat_ctx.num_param++;
@@ -226,7 +226,7 @@ ident_decl
     : IDENT decl_init_or_none {
 
             if (global_stat_ctx.type == ET_VOID ) {
-                ERR("variable cant be void.");
+                ERR("variable type cant be void: %s", $1);
             }
 
             Symbol sym = {};
@@ -234,7 +234,7 @@ ident_decl
             sym.is_const = global_stat_ctx.is_const;
             strcpy(sym.name, $1);
             if (insert(&sym) == SYMTAB_ERR_DUP) {
-                ERR("symbol tabel name conflict.");
+                ERR("identifier conflict: %s", $1);
             }
 
             TRACE("var_decl", "ident: %s", $1);
@@ -259,7 +259,7 @@ ary_decl
 
         } bracket_list SEMICOLON {
             if (insert(&global_stat_ctx.sym) == SYMTAB_ERR_DUP) {
-                ERR("symbol tabel name conflict.");
+                ERR("identifier conflict: %s", $2);
             }
             TRACE("ary_decl", "ident: %s", $2);
         }
@@ -399,7 +399,7 @@ expression
     | IDENT {
             Symbol *sym = search($1);
             if (!sym) {
-                ERR("Identifier not exists.");
+                ERR("identifier not exists.");
             }
             TRACE("IDNET", "ident:%s", $1);
             $$ = sym->base_type;
@@ -418,7 +418,7 @@ literal
 ary_invoke
     : IDENT dim_expr_list {
         if (!search($1)) {
-            ERR("Identifier not exists.");
+            ERR("identifier not exists.");
         }
         TRACE("ary_invoke", "ident: %s", $1);
     }
@@ -431,7 +431,7 @@ func_invoke
     : IDENT L_PARENTHESES arg_expr_list R_PARENTHESES {
             Symbol *sym = search($1);
             if (!sym) {
-                ERR("Identifier not exists.");
+                ERR("identifier not exists.");
             }
             TRACE("func_invoke", "ident: %s", $1);
             $$ = sym->base_type;
@@ -460,7 +460,7 @@ void check_main_function() {
     Symbol *sym = search("main");
     if (sym) {
         if (sym->base_type != ET_VOID) {
-            ERR("main func's return type should be void\n");
+            ERR("main func's return type should be void.\n");
         }
         if (sym->param_num != 0) {
             ERR("main func shouldnt have param.\n");
@@ -476,9 +476,7 @@ int main() {
     printf("Start to parsing program:\n");
     yyparse();
 
-    printf("\n");
     print_symtab_ctx();
-
     check_main_function();
 
     return 0;

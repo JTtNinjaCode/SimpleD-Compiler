@@ -1,0 +1,7 @@
+/* type mismatch in operation */
+void main() {
+    int a = 5;
+    float b = 4;
+    // No implement implicit type conversion
+    a + b;
+}

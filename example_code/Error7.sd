@@ -1,0 +1,3 @@
+/* main func's return type should be void */
+void main(int a) {
+}

@@ -1,7 +1,7 @@
 /* Sigma.sd
  *
  * Compute sum = 1 + 2 + ... + n
-*/
+ */
 
 // constant and variables
 const int n = 10;

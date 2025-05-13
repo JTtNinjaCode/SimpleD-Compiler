@@ -133,8 +133,10 @@ void print_symtab_ctx() {
     SymTab *st = symtab_ctx.curr_st;
     int depth = symtab_ctx.layer_count;
 
+    printf("\n");
     while (st) {
         print_symtab_single(st, depth--);
         st = st->parent;
     }
+    printf("\n");
 }

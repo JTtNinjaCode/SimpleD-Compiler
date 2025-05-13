@@ -1,0 +1,3 @@
+/* main func shouldnt have param */
+int main() {
+}
