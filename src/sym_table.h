@@ -1,7 +1,14 @@
 #ifndef SYM_TABLE_H
 #define SYM_TABLE_H
 
-#include "y.tab.h"
+
+/* expr type */
+#define ET_INT      1
+#define ET_BOOL     2
+#define ET_FLOAT    3
+#define ET_DOUBLE   4
+#define ET_STRING   5
+#define ET_VOID     6
 
 #include <string.h>
 #include <stdbool.h>
@@ -36,6 +43,11 @@ typedef struct SymTabCtx {
     SymTab *root;
     SymTab *curr_st;
     int layer_count;
+
+    /* call stack */
+    SymTab *func_stk[1024];
+    int curr_func;
+    bool at_least_one_return;
 } SymTabCtx;
 
 extern SymTabCtx symtab_ctx;
@@ -53,6 +65,7 @@ Symbol* search(const char *name);
 
 // Add a new symbol table layer
 void add_symtab_layer();
+void push_func_to_stk(); /* call after add_symtab_layer */
 
 // Delete the most recent symbol table layer
 void delete_symtab_layer();

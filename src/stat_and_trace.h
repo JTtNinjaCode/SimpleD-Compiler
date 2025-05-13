@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "sym_table.h"
 
 struct GlobalStatContext {
     int indent;
@@ -12,9 +13,6 @@ struct GlobalStatContext {
     bool func_call;
     Symbol sym;
 
-    /* for search symbol */
-    int search_base_type;
-    int search_ret_type;
 } global_stat_ctx;
 
 struct LocalStatContext {
@@ -31,7 +29,7 @@ struct LocalStatContext {
     printf("[%-10s] " fmt "\n", tag, ##__VA_ARGS__);\
 } while(0)
 
-#define ERR(msg) do {\
-    printf("[Error] %s\n", msg);\
+#define ERR(fmt, ...) do {\
+    printf("[Error] " fmt "\n", ##__VA_ARGS__);\
     exit(EXIT_FAILURE);\
 } while(0)

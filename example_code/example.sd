@@ -1,5 +1,9 @@
 const int a;
 
+int add (int a,int b)
+{
+  return a+b;
+}
 
 void main()
 {
@@ -19,6 +23,5 @@ void main()
   int a4;
   int a5;
   a0 + a1 * (a2 * a3) / a4 * -a1 > 5;
-  add(2 + 3);
 }
 

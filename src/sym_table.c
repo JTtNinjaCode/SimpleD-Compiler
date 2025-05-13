@@ -92,13 +92,18 @@ void delete_symtab_layer() {
     }
 }
 
+void push_func_to_stk() {
+    
+}
+
 static const char *type_to_str(int t) {
     switch (t) {
-        case INT:       return "int";
-        case FLOAT:     return "float";
-        case DOUBLE:    return "double";
-        case STRING:    return "string";
-        case VOID:      return "void";
+        case ET_INT:       return "int";
+        case ET_FLOAT:     return "float";
+        case ET_DOUBLE:    return "double";
+        case ET_STRING:    return "string";
+        case ET_VOID:      return "void";
+        case ET_BOOL:      return "bool";
         default:        return "unknown";
     }
 }
